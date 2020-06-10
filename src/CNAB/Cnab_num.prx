@@ -1,0 +1,76 @@
+#include "rwmake.ch"        // incluido pelo assistente de conversao do AP5 IDE em 27/03/00
+
+User Function Cnab_num()        // incluido pelo assistente de conversao do AP5 IDE em 27/03/00
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Declaracao de variaveis utilizadas no programa atraves da funcao    ³
+//³ SetPrvt, que criara somente as variaveis definidas pelo usuario,    ³
+//³ identificando as variaveis publicas do sistema utilizadas no codigo ³
+//³ Incluido pelo assistente de conversao do AP5 IDE                    ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+LOCAL AREA1,NUM,X,AUX,_cFixo4,cCalcDvNN,nSomaNN,_VarFix
+
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡ao    ³CNAB_NUM  ³ Autor ³MAURICIO/GATASSE       ³ Data ³25.02.00  ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡Æo ³FORMATA O CAMPO NOSSONUM PARA O FORMATO DO BANCO NO PADRAO  ³±±
+±±³          ³CNAB                                                        ³±±
+±±³          ³                                                            ³±±
+±±³          ³                                                            ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Uso       ³CHAMADO PELO LAY-OUTDO CNAB                                 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Tabelas   ³-                                                           ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Modulo    ³FINANCEIRO                                                  ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+//FORMATA O NOSSONUM()
+AREA1:=GETAREA()
+DBSELECTAREA("SEE")
+_cFixo4   := "432765432765432765432765432765432"
+
+NUM := VAL(SEE->EE_FAXATU)+1
+IF VAL(SEE->EE_FAXFIM)-VAL(SEE->EE_FAXATU)<1000
+	MSGSTOP("Faixa atual proxima da faixa final. Verifique parametros em SEE.")
+ENDIF
+X:=STRZERO(NUM,12)
+RecLock("SEE",.F.)
+replace SEE->EE_FAXATU with X
+MSUnlock()
+X:=SUBSTR(X,-11)
+x:="09"+x  //CARTEIRA+NUMERO
+
+* Calcula o DAC do Nosso N£mero
+nSomaNN := 0
+_VarFix := Right(_cFixo4,13) //RdMake Inicial tinha 10
+For nI := 1 to 13             
+	nSomaNN := nSomaNN + ;
+    (Val(Substr((X),nI,1))*Val(Substr(_VarFix,nI,1)))
+Next       
+AUX:=(11-(nSomaNN%11))
+cCalcDvNN := ALLTRIM(str(AUX))
+
+if 	AUX == 10
+	cCalcDvNN := "P"
+Endif
+if 	AUX == 11
+	cCalcDvNN := "0"
+Endif
+
+X:= X + cCalcDvNN //NossoNumero + Digito Verificador
+X:=SUBSTR(X,-12)
+
+RecLock("SE1",.F.)
+Replace  E1_NUMBCO  With  X
+MsUnlock()
+
+RESTAREA(AREA1)
+
+Return(X)        // incluido pelo assistente de conversao do AP5 IDE em 27/03/00

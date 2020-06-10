@@ -1,0 +1,75 @@
+#include "rwmake.ch"
+
+User Function Gat0001()
+SetPrvt("CALIAS,NORD,CREC,NVALOR,TIPO,NPRODCOL,OSOPOBR")
+
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡ao    ³GAT0001   ³ Autor ³MAURICIO/GATASSE       ³ Data ³25.02.00  ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡Æo ³SUGERE A CONTA CONTABIL NOS PEDIDOS DE COMPRA               ³±±
+±±³          ³                                                            ³±±
+±±³          ³                                                            ³±±
+±±³          ³                                                            ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Uso       ³GATILHO                                                     ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Tabelas   ³SB1,SF4                                                     ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Modulo    ³ESTOQUE                                                     ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+cAlias := Alias()
+nOrd := IndexOrd()
+cRec := Recno()
+nValor:=""
+// Verificar TES que gerem Contas a Receber
+nTESCol := (AScan(aHeader,{|aItem| AllTrim(aItem[2]) == "D1_TES"}))
+nProdCol := (AScan(aHeader,{|aItem| AllTrim(aItem[2]) == "D1_COD"}))
+nPCCol := (AScan(aHeader,{|aItem| AllTrim(aItem[2]) == "D1_PEDIDO"}))
+nITPCCol := (AScan(aHeader,{|aItem| AllTrim(aItem[2]) == "D1_ITEMPC"}))
+Posicione("SB1",1,XFILIAL("SB1")+aCols[N,nProdCol],"B1_COD")
+nValor :=RETFIELD("SC7",1,XFILIAL("SC7")+ACOLS[N,nPCCol]+ACOLS[N,nITPCCol],"C7_CONTA")
+dbSelectArea("SF4")
+dbSetOrder(1)
+dbSeek(XFILIAL("SF4")+ACOLS[n][nTESCol])
+TIPO := SF4->F4_TIPOCTA
+OSOPOBR := SF4->F4_OSOPOBR
+dbSelectArea(cAlias)
+dbSetOrder(nOrd)
+dbGoTo(cRec)
+
+if OSOPOBR=="1"  //TES com OS obrigatoria deve gerar estoque
+   nValor:=SB1->B1_CONTA
+endif
+
+if alltrim(nValor)=="" 
+	
+	IF TIPO == "I"
+		nValor:="2204010103"   // Conta Transitoria de Ativo Fixo - 25/05/2000 - Mauricio
+	ENDIF
+	IF TIPO == "E" 
+		nValor:=SB1->B1_CONTA
+	ENDIF
+	IF TIPO == "D"
+		nValor:=SB1->B1_CTBADES
+	ENDIF
+	IF TIPO == "C"
+		nValor:=SB1->B1_CTBACUS
+	ENDIF
+	IF TIPO == "Y"
+		nValor:=SB1->B1_CTBACI
+	ENDIF
+	IF TRIM(M->CESPECIE) == "NDO"
+		nValor:=SB1->B1_CONTA
+	endif
+	if nValor == ""
+		nValor := "DIGITE"
+	endif
+endif
+Return(nValor)
+

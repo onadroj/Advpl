@@ -1,0 +1,504 @@
+#include "rwmake.ch"        // incluido pelo assistente de conversao do AP5 IDE em 27/03/00
+#IFNDEF WINDOWS
+   #DEFINE PSAY SAY
+#ENDIF
+
+User Function Duplica()        // incluido pelo assistente de conversao do AP5 IDE em 27/03/00
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Declaracao de variaveis utilizadas no programa atraves da funcao    ³
+//³ SetPrvt, que criara somente as variaveis definidas pelo usuario,    ³
+//³ identificando as variaveis publicas do sistema utilizadas no codigo ³
+//³ Incluido pelo assistente de conversao do AP5 IDE                    ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+SetPrvt("CBTXT,CBCONT,NORDEM,ALFA,Z,M")
+SetPrvt("TAMANHO,LIMITE,TITULO,CDESC1,CDESC2,CDESC3")
+SetPrvt("ARETURN,NOMEPROG,CPERG,NLASTKEY,LCONTINUA,NLIN")
+SetPrvt("WNREL,CABEC1,CABEC2,M_PAG,CSTRING,CCODIPREF")
+SetPrvt("CFATUINIC,CFATUFINA,CISSRETIDO,ATRABSTRU,CTEMPITEM,NSM0REG")
+SetPrvt("CCODIEMPR,CCODIFILI,CNOMEFILI,CCODICLIE,CNOMECLIE,CRuaClie")
+SetPrvt("CBrCli,CMUNICLIE,CESTACLIE,CCGCCLIEN,CINSCCLIE,CCEPCLIEN")
+SetPrvt("CTELECLIE,CECbr,CBAIRCOBR,CMUNICOBR,CESTACOBR,CCEPCOBRA")
+SetPrvt("CTELECOBR,CCODINTFI,CSERINTFI,WFILIAL,WPREFIXO,WNUM")
+SetPrvt("WTIPO,WFORNECE,WLOJA,CALIAANTE,NAREAANTE")
+SetPrvt("NREGIANTE,ACHOU,NVALRNTFI,CTIPOVEND,NTAMEXTE,NLINHA")
+
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡ao    ³DUPLICA   ³ Autor ³MAURICIO/GATASSE       ³ Data ³25.02.00  ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡Æo ³ROTINA DE EMISSAO DE DUPLICATAS.                            ³±±
+±±³          ³                                                            ³±±
+±±³          ³                                                            ³±±
+±±³          ³                                                            ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Uso       ³RELATORIO                                                   ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Tabelas   ³SM0,SX1,SE1,SA1,SF2,SE2                                     ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Modulo    ³FATURAMENTO                                                 ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±³Ult.Alter.³20/09/01 - Abatia impostos em todas as duplicatas           ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+#IFNDEF WINDOWS
+// Movido para o inicio do arquivo pelo assistente de conversao do AP5 IDE em 27/03/00 ==>    #DEFINE PSAY SAY
+#ENDIF
+
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Define Variaveis Ambientais                                  ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+CbTxt     := ""
+CbCont    := ""
+nOrdem    := 0
+Alfa      := 0
+Z         := 0
+M         := 0
+tamanho   := "P"
+limite    := 132
+titulo    := "Impressao das Faturas"
+cDesc1    := "Este programa tem o objetivo de Imprimir as Faturas"
+cDesc2    := ""
+cDesc3    := ""
+aReturn   := { "Especial", 1,"Administracao", 1, 2, 1,"",1 }
+nomeprog  := "DPMEGA"
+cPerg     := "DPMEGA"
+nLastKey  := 0
+lContinua := .T.
+nLin      := 0
+wnrel     := "DPMEGA"
+cabec1    := ""
+cabec2    := ""
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Variaveis utilizadas para Impressao do Cabecalho e Rodape    ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+cbtxt     := SPACE(10)
+cbcont    := 0
+m_pag     := 1
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Verifica as perguntas selecionadas, busca o padrao da Nfiscal           ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+Pergunte(cPerg,.F.)               // Pergunta no SX1
+
+
+cString   := "SE1"
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Envia controle para a funcao SETPRINT                        ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+wnrel := SetPrint(cString,wnrel,cPerg,Titulo,cDesc1,cDesc2,cDesc3,.T.)
+
+
+If nLastKey == 27
+   Return
+Endif
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Verifica Posicao do Formulario na Impressora                 ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+SetDefault(aReturn,cString)
+
+If nLastKey == 27
+   Return
+Endif
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Verifica as perguntas selecionadas                           ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Variaveis utilizadas para parametros                         ³
+//³ mv_par03             // Prefixo                              ³
+//³ mv_par05             // Da Fatura                            ³
+//³ mv_par06             // Ate Fatura                           ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+cCodiPref := mv_par01
+cFatuInic := mv_par02
+cFatuFina := mv_par03
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Verifica existem os arquivos a processar                     ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+FCriaTrab()
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³                                                              ³
+//³ Inicio do Processamento da Nota Fiscal                       ³
+//³                                                              ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+#IFDEF WINDOWS
+   RptStatus({|| RptDetail()})// Substituido pelo assistente de conversao do AP5 IDE em 27/03/00 ==>    RptStatus({|| Execute(RptDetail)})
+   Return
+// Substituido pelo assistente de conversao do AP5 IDE em 27/03/00 ==>    Function RptDetail
+#ENDIF
+
+Static Function RptDetail()
+
+FImprime()
+dbSelectArea("TRABITEM")
+dbCloseArea()
+FErase(cTempItem+".*")
+Return
+
+
+
+// Substituido pelo assistente de conversao do AP5 IDE em 27/03/00 ==> Function FCriaTrab
+Static Function FCriaTrab()
+/*****************************************************************************
+* Rotina para Criacao dos Arquivos de Trabalho
+*
+***/
+
+aTrabStru := {}
+
+Aadd(aTrabStru,{"CodiFili","C", 02,0})
+Aadd(aTrabStru,{"NomeFili","C", 40,0})
+Aadd(aTrabStru,{"CodiClie","C", 06,0})
+Aadd(aTrabStru,{"NomeClie","C", 60,0})
+Aadd(aTrabStru,{"RuaClie","C", 60,0})
+Aadd(aTrabStru,{"BrCli","C", 20,0})
+Aadd(aTrabStru,{"MuniClie","C", 25,0})
+Aadd(aTrabStru,{"EstaClie","C", 02,0})
+Aadd(aTrabStru,{"CGCClien","C", 14,0})
+Aadd(aTrabStru,{"InscClie","C", 18,0})
+Aadd(aTrabStru,{"CEPClien","C", 08,0})
+Aadd(aTrabStru,{"TeleClie","C", 15,0})
+Aadd(aTrabStru,{"ECbr","C", 60,0})
+
+//Aadd(aTrabStru,{"ECbr","C", 60,0}) alterado
+//Aadd(aTrabStru,{"BairCobr","C", 20,0})
+//Aadd(aTrabStru,{"MuniCobr","C", 25,0})
+//Aadd(aTrabStru,{"EstaCobr","C", 02,0})
+//Aadd(aTrabStru,{"CEPCobra","C", 08,0})
+//Aadd(aTrabStru,{"TeleCobr","C", 15,0})
+
+Aadd(aTrabStru,{"CodiFatu","C", 09,0})
+Aadd(aTrabStru,{"cdprc","C", 01,0})
+Aadd(aTrabStru,{"DataVenc","D", 08,0})
+Aadd(aTrabStru,{"DataEmis","D", 08,0})
+Aadd(aTrabStru,{"CodiPedi","C", 06,0})
+Aadd(aTrabStru,{"ValrTitu","N", 17,2})
+Aadd(aTrabStru,{"ImprParc","C", 01,0})
+Aadd(aTrabStru,{"TipoVend","C", 01,0})
+Aadd(aTrabStru,{"CodiNtFi","C", 09,0})
+Aadd(aTrabStru,{"SeriNtFi","C", 03,0})
+Aadd(aTrabStru,{"ValrNtFi","N", 16,2})
+
+cTempItem := CriaTrab(aTrabStru)
+dbUseArea( .T.,, cTempItem, "TRABITEM",.F.,.F.)
+IndRegua("TRABITEM",cTempItem,"CodiFili+CodiFatu+cdprc",,,"Selecionando Registros...")
+
+FGravTrab()
+
+Return
+
+
+
+// Substituido pelo assistente de conversao do AP5 IDE em 27/03/00 ==> Function FGravTrab
+Static Function FGravTrab()
+/*****************************************************************************
+* Gravacao dos Arquivos de Trabalho
+*
+***/
+
+dbSelectArea("SM0")
+
+nSM0Reg   := RecNo()
+cCodiEmpr := SM0->M0_Codigo
+
+dbSelectArea("SE1")
+Set SoftSeek On
+dbSeek(xFilial("SE1")+cCodiPref+cFatuInic)
+Set SoftSeek Off
+While ((! Eof())                         .And. ;
+      (SE1->E1_Filial  == xFilial("SE1")) .And. ;
+      (SE1->E1_Prefixo == cCodiPref)     .And. ;
+      (SE1->E1_Num     <= cFatuFina))     
+
+
+   IF !("-" $ SE1->E1_TIPO)                           // - e um Titulo de Imposto a Receber
+       FGravItem()                                    // nao precisa imprimir a duplicada dele
+   ENDIF                                             
+
+   dbSelectArea("SE1")
+   dbSkip()
+EndDo
+
+dbSelectArea("SM0")
+dbGoTo(nSM0Reg)
+
+Return
+
+
+
+// Substituido pelo assistente de conversao do AP5 IDE em 27/03/00 ==> Function FGravItem
+Static Function FGravItem()
+/*****************************************************************************
+* Rotina para gravacao dos itens do Arquivo
+*
+***/
+
+dbSelectArea("SM0")
+dbSeek(cCodiEmpr+Left(SE1->E1_Prefixo,2))
+
+cCodiFili := SM0->M0_CodFil
+cNomeFili := SM0->M0_NomeCom
+
+dbSelectArea("SA1")
+dbSeek(xFilial("SA1")+SE1->E1_Cliente)
+
+cCodiClie := SA1->A1_Cod
+cNomeClie := SA1->A1_Nome
+cRuaClie := SA1->A1_End
+cBrCli := SA1->A1_Bairro
+cMuniClie := SA1->A1_Mun
+cEstaClie := SA1->A1_Est
+cCGCClien := SA1->A1_CGC
+cInscClie := SA1->A1_InscR
+cCEPClien := SA1->A1_CEP
+cTeleClie := SA1->A1_Tel
+cECbr := SA1->A1_EndCob
+
+//cECbr := SA1->A1_EndCob alterado
+//cBairCobr := SA1->A1_BairCob
+//cMuniCobr := SA1->A1_MunCob
+//cEstaCobr := SA1->A1_EstCob
+//cCEPCobra := SA1->A1_CEPCob
+//cTeleCobr := SA1->A1_TelCob
+
+
+dbSelectArea("SF2")
+dbSeek(xFilial("SF2")+SE1->E1_Num+SE1->E1_Serie)
+
+cCodiNtFi := SF2->F2_Doc
+cSeriNtFi := SF2->F2_Serie
+cIssRetido := SF2->F2_ValIss
+cTipoVend := IIf(SF2->F2_ValISS == 0,"V","S")
+
+wFilial  := xFilial("SF2")
+//wPrefixo := "A  "            //SF2->F2_SERIE
+wPrefixo := SF2->F2_SERIE
+wNum     := SF2->F2_DOC
+wTipo    := "TX "
+wFornece := "MUNIC "
+wLoja    := "00"
+
+
+dbSelectArea("SE2")    
+dborderNickName("SE24")
+//
+
+IF dbSeek(wFilial+wPrefixo+wNum+wTipo+wFornece+wLoja)
+   Achou := .T.
+ELSE
+   Achou := .F.	// O iss sera retido pelo cliente
+ENDIF
+
+if SE1->E1_PARCELA $" A1" .or. SE1->E1_PARCELA=="001"
+//   if ACHOU
+//      nValrNtFi := SE1->E1_SALDO - SE1->E1_Inss
+//   else
+//      nValrNtFi := SE1->E1_SALDO - SE1->E1_Inss - cIssRetido
+//   endif
+   nValrNtFi := SE1->E1_SALDO - SE1->E1_INSS - SE1->E1_PIS - SE1->E1_COFINS - SE1->E1_CSLL
+else
+   nValrNtFi := SE1->E1_SALDO - SE1->E1_INSS - SE1->E1_PIS - SE1->E1_COFINS - SE1->E1_CSLL
+endif
+
+dbSelectArea("TRABITEM")
+RecLock("TRABITEM",.T.)
+
+Replace CodiFili With cCodiFili
+Replace NomeFili With cNomeFili
+Replace CodiClie With cCodiClie
+Replace NomeClie With cNomeClie
+Replace RuaClie With cRuaClie
+Replace BrCli With cBrCli
+Replace MuniClie With cMuniClie
+Replace EstaClie With cEstaClie
+Replace CGCClien With cCGCClien
+Replace InscClie With cInscClie
+Replace CEPClien With cCEPClien
+Replace TeleClie With cTeleClie
+Replace ECbr With cECbr
+
+//Replace ECbr With cECbr  alterado
+//Replace BairCobr With cBairCobr
+//Replace MuniCobr With cMuniCobr
+//Replace EstaCobr With cEstaCobr
+//Replace CEPCobra With cCEPCobra
+//Replace TeleCobr With cTeleCobr
+
+Replace CodiFatu With SE1->E1_Num
+Replace cdprc With SE1->E1_Parcela
+Replace DataEmis With SE1->E1_Emissao
+Replace DataVenc With SE1->E1_Vencto
+Replace CodiPedi With SE1->E1_Pedido
+if nValrNtfi <> 0
+        Replace ValrTitu With nValrNtfi
+        Replace CodiNtFi With cCodiNtfi
+        Replace ValrNtFi With nValrNtfi
+else
+        Replace ValrTitu With SE1->E1_Valor
+        Replace CodiNtFi With SE1->E1_Num
+        Replace ValrNtFi With SE1->E1_Valor
+endif
+Replace ImprParc With IIf(! Empty(SE1->E1_Parcela),"*","")
+
+Replace SeriNtFi With cSeriNtfi
+
+Replace TipoVend With cTipoVend
+MsUnlock()
+
+dbSelectArea("SE1")
+
+Return
+
+
+
+// Substituido pelo assistente de conversao do AP5 IDE em 27/03/00 ==> Function FImprime
+Static Function FImprime()
+/*****************************************************************************
+* Impressao do Relatorio
+*
+***/
+
+SetPrc(0,0)
+//@ 00, 000 PSAY Chr(27)+"C"+Chr(36)                     // Pagina Tamanho 33 Linhas
+@ 00, 000 PSAY Chr(27)+"C33"                           // Pagina Tamanho 33 Linhas
+@ 00, 000 PSAY Chr(15)                                 // Compressao de Impressao
+
+dbSelectArea("TRABITEM")
+dbGoTop()
+
+//ProcRegua(RecCount()) //comentado pois estava dando erro
+
+While (! Eof())
+ //  IncProc()      //comentado pois estava dando erro
+   FTestExit()
+
+   If (! lContinua)
+      Exit
+   EndIf
+
+   FDetaItem()
+
+   dbSelectArea("TRABITEM")
+   dbSkip()
+EndDo
+
+@ 00, 000 PSAY chr(18)              // Descompressao de Impressao
+//@ 00, 000 PSAY Chr(27)+"C"+Chr(66)  //  Retornar ao que era antes 'From dust to dust'...
+@ 00, 000 PSAY Chr(27)+"C66"          //  Retornar ao que era antes 'From dust to dust'...
+
+//SetPgEject(.F.)
+If aReturn[5] == 1
+   Set Printer TO
+   dbcommitAll()
+   ourspool(wnrel)
+EndIf
+
+MS_FLUSH()
+
+Return
+
+
+
+// Substituido pelo assistente de conversao do AP5 IDE em 27/03/00 ==> Function FTestExit
+Static Function FTestExit()
+/*****************************************************************************
+* Testa se o usuario cancelou o relatorio
+*
+***/
+
+#IFNDEF WINDOWS
+   If (LastKey() == 286)
+      @ 00,01 PSAY "** CANCELADO PELO OPERADOR **"
+      lContinua := .F.
+   EndIf
+#ELSE
+   If lAbortPrint
+      @ 00,01 PSAY "** CANCELADO PELO OPERADOR **"
+      lContinua := .F.
+   EndIf
+#ENDIF
+
+Return
+
+
+
+// Substituido pelo assistente de conversao do AP5 IDE em 27/03/00 ==> Function FDetaItem
+Static Function FDetaItem()
+/*****************************************************************************
+* Impressao dos itens do IMPRCABE
+*
+***/
+
+//@ 03,112 PSAY TRABITEM->CodiFili
+//@ 03,115 PSAY Left(TRABITEM->NomeFili,20)
+//@ 06,006 PSAY TRABITEM->CodiClie
+
+@ 07,090 PSAY TRABITEM->DataEmis
+
+//@ 08,006 PSAY TRABITEM->CodiPedi
+
+@ 11,000 PSAY TRABITEM->ValrNtFi  Picture "@RE 999,999,999.99"
+@ 11,030 PSAY TRABITEM->CodiNtFi
+@ 11,042 PSAY TRABITEM->ValrTitu  Picture "@RE 999,999,999.99"
+@ 11,072 PSAY TRABITEM->CodiFatu
+@ 11,078 PSAY "-"
+@ 11,079 PSAY TRABITEM->cdprc
+@ 11,093 PSAY TRABITEM->DataVenc
+
+@ 16,040 PSAY TRABITEM->NomeClie
+@ 17,040 PSAY TRABITEM->RuaClie
+@ 17,102 PSAY TRABITEM->BrCli
+@ 18,040 PSAY TRABITEM->MuniClie
+@ 18,085 PSAY TRABITEM->EstaClie
+@ 18,101 PSAY TRABITEM->CEPClien  Picture"@R 99999-999"
+//@ 19,040 PSAY TRABITEM->MuniClie  Alterado por Gatasse em 13/08/99
+@ 19,040 PSAY TRABITEM->ECbr
+//@ 20,040 PSAY TRABITEM->ECbr
+//@ 21,040 PSAY TRABITEM->MuniCobr
+//@ 21,085 PSAY TRABITEM->EstaCobr
+//@ 21,101 PSAY TRABITEM->CEPCobra Picture"@R 99999-999"
+//@ 22,010 PSAY TRABITEM->BairCobr
+
+@ 20,040 PSAY TRABITEM->CGCClien Picture"@R 99.999.999/9999-99"
+@ 20,085 PSAY TRABITEM->InscClie
+
+aAreaX := GETAREA()  //Funcao extenso desposiciona o Alias
+nTamExte := Len(Extenso(TRABITEM->ValrTitu))
+
+If (nTamExte > 100)
+   @ 22 ,041 PSAY SubStr(Extenso(TRABITEM->ValrTitu),1,096)
+   @ 23 ,041 PSAY SubStr(Extenso(TRABITEM->ValrTitu),097) + " " + Replicate("*",095 - (nTamExte - 096))
+Else
+   @ 22 ,041 PSAY SubStr(Extenso(TRABITEM->ValrTitu),001,nTamExte) + " " + Replicate("*",095 - nTamExte)
+   @ 23 ,041 PSAY Replicate("*",096)
+EndIf
+RESTAREA(aAreaX)
+
+//For nLinha := 1 To 32
+//    @ nLinha,000 PSAY Replicate("*",132)
+//Next
+
+Eject
+
+dbSelectArea("TRABITEM")
+
+Return

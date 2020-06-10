@@ -1,0 +1,249 @@
+#include "rwmake.ch" 
+
+User Function AtuaSZJ()
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡ao    ³ATUASZJ   ³ Autor ³GATASSE                ³ Data ³11.03.02  ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡Æo ³MANUTENCAO DA LIBERACAO DE BORDEROS                         ³±±
+±±³          ³                                                            ³±±                    
+±±³          ³                                                            ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Uso       ³MODELO 3                                                    ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Tabelas   ³SZJ                                                         ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Modulo    ³FINANCEIRO                                                  ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+Local _aAreaX3
+SetPrvt("_NI,")
+SetPrvt("_LRET,VANTIGO,CCHAV,VL")
+SetPrvt("NFIELD,CMACRMEMO,XVALRMACR,NLINHA,")
+
+Do Case
+   Case (ParamIXB $ "A/E")
+        nOpcE:=3                // 3 -> Pode alterar Enchoice
+        nOpcG:=2   	             // "      "     "    GetDados
+
+   Case (ParamIXB $ "V")
+        nOpcE:=2               // 2 -> Apenas vizualiza
+        nOpcG:=2
+EndCase
+
+RegToMemory("SZJ",(ParamIXB == "I"))  // Cria as variaveis da parte de cima
+
+nUsado:=0
+dbSelectArea("SX3")
+dbSeek("SEA")
+aHeader:={}
+While (! Eof()) .And. (SX3->X3_Arquivo == "SEA")                                               
+   If ((AllTrim(SX3->X3_Campo) == "EA_SITUACA") .Or. ;
+      (AllTrim(SX3->X3_Campo) == "EA_SALDO") .Or. ;
+      (AllTrim(SX3->X3_Campo) == "EA_OCORR"))
+      dbSelectArea("SX3")
+  //    dbSkip()                          
+//      Loop
+   else
+	   If X3Uso(SX3->X3_Usado) .And. (cNivel >= SX3->X3_Nivel)
+    	  nUsado := nUsado+1
+	      Aadd(aHeader,{TRIM(x3_titulo), x3_campo, x3_picture,  ;
+    	                x3_tamanho, x3_decimal,"AllwaysTrue()", ;
+        	            x3_usado  , x3_tipo   , x3_arquivo, x3_context})
+
+          If Alltrim(x3_campo)=="EA_PARCELA" .AND. SZJ->ZJ_TIPO=="P"
+			_aAreaX3 := GetArea()
+        	DbSelectArea("SX3")
+        	DbSeek("SE2")
+        	While !Eof() .AND. SX3->X3_Arquivo == "SE2"
+				If AllTrim(SX3->X3_CAMPO)=="E2_NOMFOR" .OR. AllTrim(SX3->X3_CAMPO)=="E2_HIST" .OR. AllTrim(SX3->X3_CAMPO)=="E2_SALDO"
+			      Aadd(aHeader,{TRIM(x3_titulo), x3_campo, x3_picture,  ;
+		    	                x3_tamanho, x3_decimal,"AllwaysTrue()", ;
+		        	            x3_usado  , x3_tipo   , x3_arquivo, x3_context})
+		    	  nUsado := nUsado+1
+				Endif   
+				DbSkip()
+        	EndDo
+			RestArea(_aAreaX3)
+          Endif
+	   EndIf
+   Endif   
+   dbSelectArea("SX3")
+   dbSkip()
+EndDo
+
+dbSelectArea("SX3")
+dbSeek("SZJ")
+
+aCpoEnchoice:={}
+
+While (! Eof()) .And. (SX3->X3_Arquivo == "SZJ")
+
+   If X3USO(SX3->X3_Usado) .And. (cNivel >= SX3->X3_Nivel)
+       Aadd(aCpoEnchoice,SX3->X3_Campo)
+   Endif
+
+   dbSelectArea("SX3")
+   dbSkip()
+EndDo
+
+   aCols:={}
+
+   dbSelectArea("SEA")
+   dbSetOrder(1)//EA_FILIAL+EA_NUMBOR+EA_PREFIXO+EA_NUM+EA_PARCELA+EA_TIPO+EA_FORNECE+EA_LOJA
+   dbSeek(xFilial("SEA")+SZJ->ZJ_BORDERO,.T.)
+   While (! Eof())                           .And. ;
+         (SEA->EA_Filial  == xFilial("SEA")) .And. ;
+         (SEA->EA_NUMBOR == SZJ->ZJ_BORDERO)
+        IF (SEA->EA_CART == SZJ->ZJ_TIPO)
+	      Aadd(aCols,Array(nUsado+1))
+    	  For _ni:=1 To nUsado
+	         If Alltrim(aHeader[_ni,2])=="E2_NOMFOR" .AND. SEA->EA_CART=="P"
+		         aCols[Len(aCols),_ni] := RetField("SE2",1,SEA->EA_FILIAL+SEA->EA_PREFIXO+SEA->EA_NUM+SEA->EA_PARCELA+SEA->EA_TIPO+SEA->EA_FORNECE+SEA->EA_LOJA,"E2_NOMFOR") //E2_FILIAL+E2_PREFIXO+E2_NUM+E2_PARCELA+E2_TIPO+E2_FORNECE+E2_LOJA
+	         ElseIF Alltrim(aHeader[_ni,2])=="E2_HIST" .AND. SEA->EA_CART=="P"
+		         aCols[Len(aCols),_ni] := RetField("SE2",1,SEA->EA_FILIAL+SEA->EA_PREFIXO+SEA->EA_NUM+SEA->EA_PARCELA+SEA->EA_TIPO+SEA->EA_FORNECE+SEA->EA_LOJA,"E2_HIST") //E2_FILIAL+E2_PREFIXO+E2_NUM+E2_PARCELA+E2_TIPO+E2_FORNECE+E2_LOJA
+	         Else
+		         aCols[Len(aCols),_ni] := FieldGet(FieldPos(aHeader[_ni,2]))
+		     Endif
+    	  Next
+	      aCols[Len(aCols),nUsado+1]:=.F.
+        ENDIF
+      dbSelectArea("SEA")
+      dbSkip()
+   End
+If (Len(aCols) == 0)
+   aCols             := {Array(nUsado+1)}
+   aCols[1,nUsado+1] := .F.
+   For _ni:=1 to nUsado
+      aCols[1,_ni] := CriaVar(aHeader[_ni,2])
+   Next
+EndIf
+
+If (Len(aCols) > 0)
+
+   cTitulo        := "Liberacao de Bordero"
+   cAliasEnchoice := "SZJ"
+   cAliasGetD     := "SEA"
+   cLinOk         := "AllwaysTrue()"
+   cTudOk         := "AllwaysTrue()"
+   cFieldOk       := "AllwaysTrue()"
+
+//   _lRet:=Modelo3(cTitulo,cAliasEnchoice,cAliasGetD,aCpoEnchoice,cLinOk,cTudOk,nOpcE,nOpcG,cFieldOk)
+   _lRet:=Modelo3(cTitulo,cAliasEnchoice,Nil,aCpoEnchoice,cLinOk,cTudOk,nOpcE,nOpcG,cFieldOk)
+//_ok:=.f.
+_Senha:=SPACE(10)
+
+   If _lRet
+      Do Case
+         Case ParamIXB $ "A"
+              FGravaArq()
+         Case ParamIXB == "E"
+              FDeletArq()     
+     EndCase
+   Endif
+Endif
+
+Return
+
+// Substituido pelo assistente de conversao do AP5 IDE em 27/03/00 ==> FUNCTION FGravaArq
+Static FUNCTION FGravaArq()
+Local _aDados := {}
+****************************************************************************
+* Nessa rotina voce devera gravar os registros do enchoice e do GetDados
+*
+*******   
+IF M->ZJ_LIBERAD=="S" 
+	_ok:= FPedeSenha()
+	IF _ok //.and. SenhaOK(_senha)
+		dbSelectArea("SZJ")
+		dbSetOrder(1)      //ZJ_FILIAL+ZJ_TIPO+ZJ_BORDERO
+		dbSeek(xFilial("SZJ")+SZJ->ZJ_TIPO+SZJ->ZJ_BORDERO)
+		RecLock("SZJ",.F.)
+		REPLACE SZJ->ZJ_LIBERAD WITH M->ZJ_LIBERAD
+		REPLACE SZJ->ZJ_LIBPOR WITH M->ZJ_LIBPOR
+		REPLACE SZJ->ZJ_DATA WITH M->ZJ_DATA
+		MsUnLock()
+		MSGSTOP("BORDERO LIBERADO !!!")
+
+		If cEmpAnt=="03" .OR. cEmpAnt=="04" .OR. cEmpAnt=="99"
+			aAdd(_aDados,SZJ->ZJ_BORDERO)
+			aAdd(_aDados,IIF(SZJ->ZJ_TIPO=="P","Pagar","Receber"))
+			aAdd(_aDados,AllTrim(Transform(SZJ->ZJ_VALOR,"@E 999,999,999.99")))                             
+			aAdd(_aDados,SZJ->ZJ_LIBPOR)
+			aAdd(_aDados,"Liberação")
+			MEnviaMail("_LB",_aDados,,,,.T.)
+		EndIf
+
+	else
+		MSGSTOP("NAO FOI POSSIVEL LIBERAR O BORDERO.SENHA INVALIDA!")
+	ENDIF
+ELSE
+	MSGSTOP('SE QUISER LIBERAR O BORDERO PASSAR O CAMPO "LIBERADO" PARA "SIM" !!!')
+ENDIF
+return
+
+// Substituido pelo assistente de conversao do AP5 IDE em 27/03/00 ==> FUNCTION FDeletArq
+Static FUNCTION FDeletArq()
+****************************************************************************
+Local _aDados := {}
+IF M->ZJ_LIBERAD=="N" 
+	_ok := FPedesenha()
+	IF _ok //.and. SenhaOK(_senha)
+		dbSelectArea("SZJ")
+		dbSetOrder(1)      //ZJ_FILIAL+ZJ_TIPO+ZJ_BORDERO
+		dbSeek(xFilial("SZJ")+SZJ->ZJ_TIPO+SZJ->ZJ_BORDERO)
+		While (! Eof())                           .And. ;
+		      (SZJ->ZJ_Filial  == xFilial("SZJ")) .And. ;
+		      (SZJ->ZJ_BORDERO == M->ZJ_BORDERO)
+
+	        IF (SZJ->ZJ_TIPO == M->ZJ_TIPO)
+				If cEmpAnt=="03" .OR. cEmpAnt=="99"
+					aAdd(_aDados,SZJ->ZJ_BORDERO)
+					aAdd(_aDados,IIF(SZJ->ZJ_TIPO=="P","Pagar","Receber"))
+					aAdd(_aDados,AllTrim(Transform(SZJ->ZJ_VALOR,"@E 999,999,999.99")))                             
+					aAdd(_aDados,cUserName)
+					aAdd(_aDados,"Cancelamento de liberação")
+					MEnviaMail("_LB",_aDados,,,,.T.)
+				EndIf
+			   RecLock("SZJ",.F.)
+			   REPLACE SZJ->ZJ_LIBERAD WITH "N"
+			   REPLACE SZJ->ZJ_LIBPOR WITH ""
+			   REPLACE SZJ->ZJ_DATA WITH CTOD("  /  /  ")
+			   MsUnLock()
+			ENDIF
+		   dbSkip()
+		Enddo
+		MSGSTOP("BORDERO CANCELADO !!!")
+	else
+		MSGSTOP("NAO FOI POSSIVEL CANCELAR O BORDERO.SENHA INVALIDA!")
+	ENDIF
+ELSE
+	MSGSTOP('SE QUISER LIBERAR O BORDERO PASSAR O CAMPO "LIBERADO" PARA "NAO" !!!')
+ENDIF
+Return
+
+Static Function FPedeSenha()
+// Desenha a tela do programa
+	Local _Ok:= .F.
+	
+	@ 064, 033 TO 190,375 DIALOG oDlg TITLE "Senha de Liberacao"
+	@ 020, 015 SAY "Senha : "
+	@ 020, 060 GET _Senha  Valid .T. PASSWORD
+
+	@ 050, 098 BMPBUTTON TYPE 1 ACTION (NOPC:=1,Close(oDlg))
+	@ 050, 126 BMPBUTTON TYPE 2 ACTION Close(oDlg)
+
+	ACTIVATE DIALOG oDlg CENTER
+
+	IF NOPC = 1
+		PswOrder(1)		
+		If PswSeek( __cUserId, .T. )
+			_Ok := PswName( _Senha )
+		EndIf
+	END IF	
+//	_ok:=.T.
+return(_ok)  

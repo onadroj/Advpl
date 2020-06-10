@@ -1,0 +1,36 @@
+#include "rwmake.ch"        // incluido pelo assistente de conversao do AP5 IDE em 27/03/00
+
+User Function valdata()        // incluido pelo assistente de conversao do AP5 IDE em 27/03/00
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Declaracao de variaveis utilizadas no programa atraves da funcao    ³
+//³ SetPrvt, que criara somente as variaveis definidas pelo usuario,    ³
+//³ identificando as variaveis publicas do sistema utilizadas no codigo ³
+//³ Incluido pelo assistente de conversao do AP5 IDE                    ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+SetPrvt("CALIAS,CGR,CSUBGRUPO,CCLASSE,CCHAV,CCDPROD")
+
+If !INCLUI  // Inclui ‚ uma fun‡Æo l¢gica do SIGA.
+   return
+Endif
+
+
+cAlias    := Alias()
+cGr       := alltrim(M->B1_GRUANAL)
+//cSubGrupo := alltrim(M->B1_Subgr)
+//cClasse   := alltrim(M->B1_Classe)
+cChav     := cGr
+//+cSubGrupo+cClasse
+// Localizar o registro pela chave correspondente ao grupo
+//                      ÚÄÄÄÄÄ> Nome da Tabela no SX5
+dbSelectArea("SX5")
+dbSetOrder(1)
+dbSeek(xFilial("SX5")+"97"+cChav)
+
+cCdProd := cChav+SX5->X5_DESCRI
+
+dbSelectArea(cAlias)
+
+// Substituido pelo assistente de conversao do AP5 IDE em 27/03/00 ==> __Return(cCdProd)
+Return(cCdProd)        // incluido pelo assistente de conversao do AP5 IDE em 27/03/00

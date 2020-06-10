@@ -1,0 +1,150 @@
+#include "rwmake.ch"        // incluido pelo assistente de conversao do AP5 IDE em 27/03/00
+
+User Function Fa050grv()        // incluido pelo assistente de conversao do AP5 IDE em 27/03/00
+
+
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡ao    ³FA050GRV  ³ Autor ³MAURICIO/GATASSE       ³ Data ³09.07.99  ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡Æo ³Gravar sequencial e Origem no SE2, quando o titulo gerado   ³±±
+±±³          ³for INSS, ISS e IRRF                                        ³±±
+±±³          ³                                                            ³±±
+±±³          ³                                                            ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Uso       ³Apos confirmacao do registro.                               ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Tabelas   ³SE2                                                         ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Modulo    ³DR - FINANCEIRO                                             ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+
+Local _NRORPGT
+Local _aArea
+Local _aAreaSE2
+Local wSEQ
+Local wCOMPETE
+Local wCUSTO
+Local wCCUNID
+Local wHIST
+Local wFILIAL
+Local wPREFIXO
+Local wNUM
+Local wPARCIR
+Local wPARCINS
+Local wPARCISS
+Local wTIPO
+Local wFORNECE
+Local wLOJA
+PUBLIC _lFA050GRV := .T.
+
+// Caso o ponto de entrada nÆo venha de uma inclusÆo,
+// retornar sem fazer nada.
+If !INCLUI  // Inclui ‚ uma fun‡Æo l¢gica do SIGA.
+   return
+Endif
+
+_aArea := GetArea()
+
+DbSelectArea("SE2")
+_aAreaSE2 := GetArea()
+
+//PEGAR SEQUENCIAL DO TITULO ORIGEM
+wSEQ := SE2->E2_SEQ  
+wCOMPETE := SE2->E2_COMPETE  
+wCUSTO := SE2->E2_CUSTO
+wCCUNID := SE2->E2_CCUNID
+wHIST := SE2->E2_HIST
+
+wFilial  := xFilial("SE2")
+wPrefixo := SE2->E2_PREFIXO
+wNum     := SE2->E2_NUM
+wParcir  := SE2->E2_PARCIR
+wParcins := SE2->E2_PARCINS
+wParciss := SE2->E2_PARCISS
+wLoja    := "00"
+
+
+// Verifica de  Existe um titulo de IRRF em SE2
+wTipo    := "TX "
+wFornece := "UNIAO "
+dbSelectArea("SE2")
+dbSetOrder(1)
+IF dbSeek(wFilial+wPrefixo+wNum+wParcir+wTipo+wFornece+wLoja)
+   RecLock("SE2",.F.)
+   SE2->E2_SEQ := wSEQ
+   SE2->E2_ORIG := "P"
+   SE2->E2_COMPETE := wCOMPETE 
+   SE2->E2_CUSTO := wCUSTO 
+   SE2->E2_CCUNID := wCCUNID 
+   SE2->E2_HIST := wHIST
+   SE2->E2_FLUXO := "S" 
+   MSUnlock()
+ENDIF
+
+// Verifica de  Existe um titulo de INSS  em SE2
+wTipo := "INS"
+wFornece := "INPS  "
+dbSelectArea("SE2")
+dbSetOrder(1)
+IF dbSeek(wFilial+wPrefixo+wNum+wParcins+wTipo+wFornece+wLoja)
+   RecLock("SE2",.F.)
+   SE2->E2_SEQ := wSEQ
+   SE2->E2_ORIG := "P" 
+   SE2->E2_COMPETE := wCOMPETE 
+   SE2->E2_CUSTO := wCUSTO 
+   SE2->E2_CCUNID := wCCUNID 
+   SE2->E2_HIST := wHIST
+   SE2->E2_FLUXO := "S" 
+   MSUnlock()
+ENDIF
+
+// Verifica de  Existe um titulo de ISS  em SE2
+wTipo := "ISS"
+wFornece := "MUNIC "
+dbSelectArea("SE2")
+dbSetOrder(1)
+IF dbSeek(wFilial+wPrefixo+wNum+wParciss+wTipo+wFornece+wLoja)
+   RecLock("SE2",.F.)
+   SE2->E2_SEQ := wSEQ
+   SE2->E2_ORIG := "P" 
+   SE2->E2_COMPETE := wCOMPETE 
+   SE2->E2_CUSTO := wCUSTO 
+   SE2->E2_CCUNID := wCCUNID 
+   SE2->E2_HIST := wHIST
+   SE2->E2_FLUXO := "S" 
+   MSUnlock()
+ENDIF
+
+RestArea(_aAreaSE2)
+
+RestArea(_aArea)
+
+IF SE2->E2_BCOPREF == "CX " .AND. GETMV("MV_CTLIPAG") // Caso utilize a liberação de títulos para baixa, grava títulos já pagos pelos CAIXAS como liberados
+   RecLock("SE2",.F.)
+   SE2->E2_DATALIB := dDataBase
+   MsUnlock()
+ENDIF
+
+//Permite a impressão da Ordem de Pagamento caso não seja um título de retenção de imposto
+//Incrementa e grava o número da Ordem de Pagamento para o título
+if (cEmpAnt=="03" .OR. cEmpAnt=="04" .OR. cEmpAnt=="99") .AND. SUBSTR(SE2->E2_TIPO,3,1) <> "-" .AND. ALLTRIM(SE2->E2_TIPO) <> "PR" .AND. FUNNAME() <> "GPEM670" 
+	_NRORPGT := GetSXENum("SE2","E2_NRORPGT")
+	ConfirmSX8()
+	RecLock("SE2",.F.)
+	SE2->E2_NRORPGT := _NRORPGT
+	MsUnlock()
+	
+	If ApMsgYesNo("Deseja imprimir a Ordem de Pagamento?","Fa050grv")
+       ExecBlock("ORPAGTO",.F.,.F.)
+	Endif
+Endif
+
+_lFA050GRV := nil
+
+Return(.T.)        

@@ -1,0 +1,106 @@
+#include "rwmake.ch"        // incluido pelo assistente de conversao do AP5 IDE em 27/03/00
+
+User Function Valcosi2()        // incluido pelo assistente de conversao do AP5 IDE em 27/03/00
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Declaracao de variaveis utilizadas no programa atraves da funcao    ³
+//³ SetPrvt, que criara somente as variaveis definidas pelo usuario,    ³
+//³ identificando as variaveis publicas do sistema utilizadas no codigo ³
+//³ Incluido pelo assistente de conversao do AP5 IDE                    ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+SetPrvt("CALIAANTE,NAREAANTE,NREGIANTE,NVALRPOSI,NCCCRPOSI,NCCDBPOSI")
+SetPrvt("NTAMAARRA,NQTDECOPY,NLINHATUA,NLINHAPOS,AARRAATUA,NREALUSED")
+SetPrvt("NCONTPOSI,NLINHAUXI,NCONTCOPY,ACOLS,")
+
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡ao    ³VALCOSI2  ³ Autor ³MAURICIO/GATASSE       ³ Data ³25.02.00  ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡Æo ³COPIA AS LINHA DA TELA DE CONTABILIZACAO N VEZES PELO CAMPO ³±±
+±±³          ³M->I2_COPIA                                                 ³±±
+±±³          ³                                                            ³±±
+±±³          ³                                                            ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Uso       ³VALIDACAO DO USUARIO NO CAMPO I2_COPIA                      ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Tabelas   ³SI2                                                         ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Modulo    ³TODOS                                                       ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+
+IF GETMV("MV_MCONTAB")=="CON"
+	// Guardar o alias atual
+	
+	cAliaAnte := Alias()
+	nAreaAnte := IndexOrd()
+	nRegiAnte := RecNo()
+	
+	// Identificar as colunas que nao serao gravadas
+	
+	nValrPosi := (AScan(aHeader,{|aItem| AllTrim(aItem[2]) == "I2_VALOR"}))
+	nCCCrPosi := (AScan(aHeader,{|aItem| AllTrim(aItem[2]) == "I2_CCC"}))
+	nCCDbPosi := (AScan(aHeader,{|aItem| AllTrim(aItem[2]) == "I2_CCD"}))
+	
+	nTamaArra := Len(aCols)
+	nQtdeCopy := M->I2_Copia
+	nLinhAtua := n
+	nLinhApos := IIf(n+1 > nTamaArra,n,n+1)
+	
+	If (nQtdeCopy <> 0)
+		aArraAtua := {}
+		Aadd(aArraAtua, Array(len(aCols[1])))
+		Aadd(aArraAtua, Array(len(aCols[1])))
+		
+		nRealUsed := len(aCols[1])
+		
+		For nContPosi := 1 to nRealUsed
+			aArraAtua[1,nContPosi] := aCols[nLinhAtua ,nContPosi]
+			aArraAtua[2,nContPosi] := aCols[nLinhApos ,nContPosi]
+		Next
+		
+		nLinhAuxi := nTamaArra
+		
+		For nContCopy := 1 To nQtdeCopy
+			
+			nLinhAuxi := nLinhAuxi + 1
+			
+			aArraAtua[1,1]         := StrZero(nLinhAuxi,2)
+			aArraAtua[1,nValrPosi] := 0
+			aArraAtua[1,nCCCrPosi] := Space(09)
+			aArraAtua[1,nCCDbPosi] := Space(09)
+			
+			Aadd(aCols,Array(len(aCols[1])))
+			
+			For nContPosi := 1 to nRealUsed
+				aCols[nLinhAuxi,nContPosi] := aArraAtua[1,nContPosi]
+			Next
+			
+			If (aArraAtua[2,2] == "-")
+				nLinhAuxi := nLinhAuxi + 1
+				
+				aArraAtua[2,1]         := StrZero(nLinhAuxi,2)
+				aArraAtua[2,nValrPosi] := 0
+				aArraAtua[2,nCCCrPosi] := Space(09)
+				aArraAtua[2,nCCDbPosi] := Space(09)
+				
+				Aadd(aCols,Array(len(aCols[1])))
+				
+				For nContPosi := 1 to nRealUsed
+					aCols[nLinhAuxi,nContPosi] := aArraAtua[2,nContPosi]
+				Next
+			EndIf
+		Next
+	EndIf
+	
+	dbSelectArea(cAliaAnte)
+	dbSetOrder(nAreaAnte)
+	dbGoTo(nRegiAnte)
+ENDIF
+// Substituido pelo assistente de conversao do AP5 IDE em 27/03/00 ==> __Return(.T.)
+Return(.T.)        // incluido pelo assistente de conversao do AP5 IDE em 27/03/00

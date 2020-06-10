@@ -1,0 +1,1811 @@
+#include "rwmake.ch"        // incluido pelo assistente de conversao do AP5 IDE em 04/04/00
+#IFNDEF WINDOWS
+   #DEFINE PSAY SAY
+#ENDIF
+
+User Function Reldem()        // incluido pelo assistente de conversao do AP5 IDE em 04/04/00
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Declaracao de variaveis utilizadas no programa atraves da funcao    ³
+//³ SetPrvt, que criara somente as variaveis definidas pelo usuario,    ³
+//³ identificando as variaveis publicas do sistema utilizadas no codigo ³
+//³ Incluido pelo assistente de conversao do AP5 IDE                    ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+PRIVATE MCONTAB
+MCONTAB:=GETMV("MV_MCONTAB")
+
+SetPrvt("TITULO,CABEC1,CABEC2,CDESC1,CDESC2,CDESC3")
+SetPrvt("TAMANHO,LIMITE,CSTRING,CNOPERG,NOMEPROG,NLASTKEY")
+SetPrvt("ARETURN,CBTXT,CBCONT,NMAXILINH,NCONTLINH,M_PAG")
+SetPrvt("WNREL,CMATRINIC,CMATRFINA,CCCUSINIC,CCCUSFINA,DDATADEMP")
+SetPrvt("CTIPORECI,NDIASAV,DDATAAVIS,DDATAHOMO,ACAMPOS,CARQTRAB1")
+SetPrvt("CARQTRAB2,CARQNTX,CMEDDIR,CABOANT,NVEZ,NCNT")
+SetPrvt("NSAVREC,NFGTSDEP,CNOM,LCONTINUA,CMENSAGEM,NDIASDB")
+SetPrvt("CCOMPL,CPGMATER,CTABELA,CTABANT,NCASASPRCVEN,NCASASPRCTAB")
+SetPrvt("ACODFOL,AROTEIRO,VAL_SALMIN,NFALTASV,NFALTASP,NSABDOM")
+SetPrvt("NDIASSD,APD,APDV,APDRESC,AALTER,ADIFFER")
+SetPrvt("NDFERVEN,NDFERAVE,NDFERPG,VAL_ANU,VAL_BIE,VAL_TRI")
+SetPrvt("VAL_QUA,VAL_QUI,CAR_ANU,CAR_BIE,CAR_TRI,CAR_QUA")
+SetPrvt("CAR_QUI,PER_ANU,PER_BIE,PER_TRI,PER_QUA,PER_QUI")
+SetPrvt("LIM_ANU,LIM_BIE,LIM_TRI,LIM_QUA,LIM_QUI,DTB_ANU")
+SetPrvt("DTB_BIE,DTB_TRI,DTB_QUA,DTB_QUI,ACU_ANU,ACU_BIE")
+SetPrvt("ACU_TRI,ACU_QUA,ACU_QUI,MEDIASEM,SIND_ANT,NULT_DIA")
+SetPrvt("CDIASMES,NADTSERV,NPERIC,NINSAL,CCODADT,CCODINS")
+SetPrvt("NUSADO,LTAB,NNUMLIN,NACRES,NVALDESC,NVALPROV")
+SetPrvt("NORMAL,DESCANSO,LGPDAV040,NFALATUD,NFALATU,SALARIO")
+SetPrvt("SALHORA,SALDIA,SALMES,NSALPG,NSABADOMI,DDATADEM")
+SetPrvt("NPERCENCA,AINCRES,NPERCFGTS,CRESCRAIS,CAFASFGTS,COD_AM")
+SetPrvt("SVNORMAL,SVDESCANSO,CFILIAUXI,TURNOANT,NPOS,X")
+SetPrvt("NDFERV,NDFERA,NDFERIND,A040FIELD,AM040FIELD,M->RG_SALMES")
+SetPrvt("M->RG_SALDIA,M->RG_SALHORA,M->RG_DFERVEN,M->RG_DFERPRO,M->RG_MAT,M->RG_DATADEM")
+SetPrvt("M->RG_TIPORES,M->RG_DTGERAR,M->RG_DAVISO,M->RG_DATAHOM,M->RG_NOME,M->RG_NORMAL")
+SetPrvt("M->RG_DESCANS,M->RG_MEDATU,M->RG_SEMANA,AHEADER,CONTINUA,ACOLS")
+SetPrvt("NCNT1,NUSO,AVIRTUAL,CVERBADIC,ACOLS1,APD1")
+SetPrvt("NPOS0,NPOS1,NPOS2,NPOS3,NPOS4,NPOS5")
+SetPrvt("NPOS6,NPOS7,NELEM,NCOL,N,NAVOSFAL13")
+SetPrvt("LMESATU,CMESDISS,NMESADISS,NLIMSF1,NVAL_SF1,NLIMSF2")
+SetPrvt("NVAL_SF2,NDIASAFAS,NDIASMAT,NDIASAC,NDIASAD,NDIASFGTS")
+SetPrvt("DIASTRAB,DIASDSR,NDIASENF,TITULAR,DEPASME,PERCASM")
+SetPrvt("NVLRPLANO,NLIM1,NLIM2,NLIM3,NLIM4,NLIM5")
+SetPrvt("NLIM6,NPERCF1,NPERCF2,NPERCF3,NPERCF4,NPERCF5")
+SetPrvt("NPERCF6,NPERCD1,NPERCD2,NPERCD3,NPERCD4,NPERCD5")
+SetPrvt("NPERCD6,CALCASMED,CROTEIRO,ATABIR,ATINSS,NVALARRED")
+SetPrvt("NMEDFERV,NMEDFERP,NMED13O,NMED13OA,NMEDAVISO,NFGTSCT1")
+SetPrvt("NFGTSCT2,ASEGURO,ACONVENCAO,CMEDSIND,NFGTS_B,NFGTS13_B")
+SetPrvt("LCARROTE,CSEMANA,NDSR_HREX,DSR_HHEX,NDESC13,NSAL_FAMI")
+SetPrvt("NCONTRI,NSEGURO,NSEGEMP,SEGURO_B,NELEM1,NPD")
+SetPrvt("CFILANTE,NSEQ,NCONTADOR,NFOR,NSALDFGTS,NVALRAVIS")
+SetPrvt("NVALRFERI,NVALRDECI,NVALRFGTS,NVALRIDEN,NVALRTOTA,NAVOSDECI")
+SetPrvt("NAVOSFERI,NCONTAUXI,LGRAVA,CCODIVERB,NVALRVERB,NHORAVERB")
+SetPrvt("NDIASANO,NDIASCALC,NREMUTOTC,NAVISTOTC,NFERITOTC,NDECITOTC")
+SetPrvt("NFGTSTOTC,NIDENTOTC,NTOTAGERC,NREMUTOTA,NAVISTOTA,NFERITOTA")
+SetPrvt("NDECITOTA,NFGTSTOTA,NIDENTOTA,NTOTAGERA,CCCUSANTE,")
+
+
+aCampos := ARRAY(60)
+aCodFol      := ARRAY(60)
+aRoteiro     := ARRAY(60)
+aPd          := ARRAY(60)
+aPdv         := ARRAY(60)
+aPdResc      := ARRAY(60)
+aAlter       := ARRAY(60)
+aDifFer      := ARRAY(60)
+aIncRes := ARRAY(60)
+aHeader  := ARRAY(60)
+aCols    := ARRAY(60)
+aVirtual  := ARRAY(60)
+avalores:=array(6)
+cHIST:=array(6)
+ccontas:=array(2,6)
+ccontas[1,1]:="9909101"
+ccontas[1,2]:="9909102"
+ccontas[1,3]:="9909103"
+ccontas[1,4]:="9909104"
+ccontas[1,5]:="9909105"
+ccontas[1,6]:="9909106"
+ccontas[2,1]:="9909201"
+ccontas[2,2]:="9909202"
+ccontas[2,3]:="9909203"
+ccontas[2,4]:="9909204"
+ccontas[2,5]:="9909205"
+ccontas[2,6]:="9909206"
+cHist[1]:= "PPT REM."
+cHist[2]:= "PPT AVISO"
+cHist[3]:= "PPT FERIAS"
+cHist[4]:= "PPT 13o."
+cHist[5]:= "PPT FGTS"
+cHist[6]:= "PPT IND."
+
+
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡ao    ³RELDEM    ³ Autor ³MAURICIO/GATASSE       ³ Data ³25.02.00  ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡Æo ³EMISSAO DO RELATORIO PASSIVO TRABALHISTA                    ³±±
+±±³          ³                                                            ³±±
+±±³          ³                                                            ³±±
+±±³          ³                                                            ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Uso       ³FOLHA                                                       ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Tabelas   ³SR6,SRA,SRF,SRS,SRH,SRR E SRG                               ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Modulo    ³FOLHA                                                       ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+
+#IFNDEF WINDOWS
+// Movido para o inicio do arquivo pelo assistente de conversao do AP5 IDE em 04/04/00 ==>    #DEFINE PSAY SAY
+#ENDIF
+
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡„o    ³ RELDEM   ³ Autor ³ Paulo Ribeiro de Souza³ Data ³ 25.11.98 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡…o ³ Emissao do relatorio de calculo de recisoes multiplas      ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³ Uso      ³ Generico                                                   ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+/*/
+
+titulo    := "Passivo Trabalhista"
+cabec1    := ""
+cabec2    := ""
+cDesc1    := "Emissao do relatorio de calculo de recisoes multiplas"
+cDesc2    := ""
+cDesc3    := ""
+tamanho   := "M"
+limite    := 132
+cString   := "SRA"
+cNoPerg   := "RELDEM"
+nomeprog  := "RELDEM"
+nLastKey  := 0
+aReturn   :=  { "Zebrado", 1,"Administracao", 2, 2, 1, "",1 }
+
+cbtxt     := ""
+cbcont    := 0
+nMaxiLinh := 59
+nContLinh := 60
+m_pag     := 1
+
+wnrel := "RELDEM"
+wnrel := SetPrint(cString,wnrel,cNoPerg,@Titulo,cDesc1,cDesc2,cDesc3,.F.)
+
+If LastKey()== 27 .or. nLastKey== 27
+   Return
+Endif
+
+pergunte(cNoPerg,.F.)
+
+cMatrInic := mv_par01
+cMatrFina := mv_par02
+cCCusInic := mv_par03
+cCCusFina := mv_par04
+dDataDemP := mv_par05
+cTipoReci := mv_par06
+nDiasAv   := mv_par07
+dDataAvis := mv_par08
+dDataHomo := mv_par09
+tipoMov   := mv_par10
+
+SetDefault(aReturn,cString)
+
+If (LastKey()== 27) .or. (nLastKey== 27)
+   Return
+Endif
+
+FCriaTrab()
+if tipoMov   == 2
+	ApagaSzd()
+endif
+#IFDEF WINDOWS
+   Processa({|| FGravTrab()})// Substituido pelo assistente de conversao do AP5 IDE em 04/04/00 ==>    Processa({|| Execute(FGravTrab)})
+   RptStatus({|| Imprime()})// Substituido pelo assistente de conversao do AP5 IDE em 04/04/00 ==>    RptStatus({|| Execute(Imprime)})
+#ELSE
+   FGravTrab()
+   Imprime()
+#ENDIF
+
+dbSelectArea("TRBI")
+dbCloseArea()
+
+FErase(cArqTrab1+".*")
+
+dbSelectArea("TRP")
+dbCloseArea()
+
+FErase(cArqTrab2+".*")
+FErase(cArqNtx  +".*")
+
+Set Device To Screen
+dbCommitAll()
+If aReturn[5] == 1
+   Set Printer To
+   ourspool(wnrel)
+Endif
+
+FT_PFLUSH()
+
+Return
+
+
+
+// Substituido pelo assistente de conversao do AP5 IDE em 04/04/00 ==> Function FCriaTrab
+Static Function FCriaTrab()
+/*
+*****************************************************************************
+* Criacao do Arquivo de Trabalho
+*
+***
+  */
+aCampos := {}
+
+Aadd(aCampos,{"CodiCCus", "C",09,0 })
+Aadd(aCampos,{"CodiFunc", "C",06,0 })
+Aadd(aCampos,{"NomeFunc", "C",30,0 })
+Aadd(aCampos,{"DataVenc", "D",08,0 })
+Aadd(aCampos,{"DataAdmi", "D",08,0 })
+Aadd(aCampos,{"SalaBase", "N",12,2 })
+Aadd(aCampos,{"SaldFGTS", "N",12,2 })
+Aadd(aCampos,{"AvosFeri", "N",12,2 })
+Aadd(aCampos,{"AvosDeci", "N",12,2 })
+Aadd(aCampos,{"ValrRemu", "N",11,2 })
+Aadd(aCampos,{"ValrAvis", "N",11,2 })
+Aadd(aCampos,{"ValrFeri", "N",11,2 })
+Aadd(aCampos,{"ValrDeci", "N",11,2 })
+Aadd(aCampos,{"ValrFGTS", "N",11,2 })
+Aadd(aCampos,{"ValrIden", "N",11,2 })
+Aadd(aCampos,{"ValrTota", "N",12,2 })
+
+cArqTrab1  := CriaTrab(aCampos)
+
+dbSelectArea(0)
+Use (cArqTrab1) ALIAS TRBI
+dbSelectArea("TRBI")
+IndRegua("TRBI",cArqTrab1,"TRBI->CodiCCus+TRBI->CodiFunc",,,"Criando Arquivo Trabalho ...")
+
+// Cria Temporario para Calculo de Medias
+
+cArqTrab2  := ""
+cArqNtx    := ""
+
+Cria_Trp(@cArqTrab2,@cArqNtx)
+
+Return
+
+
+
+// Substituido pelo assistente de conversao do AP5 IDE em 04/04/00 ==> Function FGravTrab
+Static Function FGravTrab()
+*****************************************************************************
+* Gravacao do arquivo de trabalho
+*
+***
+
+cMedDir  := Getmv("MV_MEDDIRE")
+cAboAnt  := GetMv("MV_ABOPEC")
+
+dbSelectArea("SRA")
+//SETREGUA(LASTREC())
+
+dbSeek(xFilial("SRA")+cMatrInic)
+While (! Eof())                          .And. ;
+      (SRA->RA_Filial == xFilial("SRA")) .And. ;
+      (SRA->RA_Mat    <= cMatrFina)
+
+	IF SRA->RA_CATFUNC == "A"
+		DBSKIP()
+		LOOP
+	ENDIF
+
+   nVez      := 1
+   nCnt      := 0
+   nSavRec   := 0
+   nFgtsDep  := 0
+   cNom      := ""
+   lContinua := .T.
+   cMensagem := ""
+   nDiasDb   := 0
+   cCompl    := "N"
+   cPgMater  := "N"
+
+   cTabela      := ""
+   cTabAnt      := ""
+   nCasasPrcVen := 0
+   nCasasPrcTab := 0
+   aCodFol      := {}         // Matriz com Codigo da folha
+   aRoteiro     := {}         // Matriz do Roteiro de Calculo
+   Val_SalMin   := 0.00       // Valor Salario Minimo
+   nFaltasv     := nFaltasp  := 0
+   nSabDom      := 0
+   nDiasSd      := 0
+   aPd          := {}
+   aPdv         := {}
+   aPdResc      := {}  // Matriz que contem as verbas pagas na rescisao para Abater na rescisao complementar
+   aAlter       := {}
+   aDifFer      := {}
+
+   // Variaveis Dias de Ferias                                                         ³
+
+   nDferven    := 0
+   nDferave    := 0
+   nDFerPg     := 0
+
+   // Variaveis Adicionais Tempo de Servico
+
+   VAL_ANU  := 0.00
+   VAL_BIE  := 0.00
+   VAL_TRI  := 0.00
+   VAL_QUA  := 0.00
+   VAL_QUI  := 0.00
+   CAR_ANU  := "  "
+   CAR_BIE  := "  "
+   CAR_TRI  := "  "
+   CAR_QUA  := "  "
+   CAR_QUI  := "  "
+   PER_ANU  := 0
+   PER_BIE  := 0
+   PER_TRI  := 0
+   PER_QUA  := 0
+   PER_QUI  := 0
+   LIM_ANU  := 0
+   LIM_BIE  := 0
+   LIM_TRI  := 0
+   LIM_QUA  := 0
+   LIM_QUI  := 0
+   DTB_ANU  := CTOD('  /  /  ')
+   DTB_BIE  := CTOD('  /  /  ')
+   DTB_TRI  := CTOD('  /  /  ')
+   DTB_QUA  := CTOD('  /  /  ')
+   DTB_QUI  := CTOD('  /  /  ')
+   ACU_ANU  := " "
+   ACU_BIE  := " "
+   ACU_TRI  := " "
+   ACU_QUA  := " "
+   ACU_QUI  := " "
+   Mediasem := 12
+   Sind_ant := "  "
+
+   // Variavel Ultimo Dia do Mes
+
+   nULT_DIA    := F_ULTDIA(dDataBase)
+   cDiasMes    := Getmv("MV_DIASMES")
+
+   // Variaveis de Retorno da FSalInc
+
+   nAdtServ := 0.00
+   nPeric   := 0.00
+   nInsal   := 0.00
+   cCodAdt  := Space(3)
+   cCodIns  := Space(3)           // Codigos que Foram Gerados
+
+   // Monta a entrada de dados do arquivo
+
+   nUsado   := 0
+   lTab     := .F.
+   nNumLin  := 0
+   nAcres   := 0
+   nValDesc := 0.00
+   nValProv := 0.00
+   Normal   := 0.00
+   Descanso := 0.00
+
+   lGpdAv040 := .F.
+
+   // Faltas do Mes
+
+   nFalAtuD         := 0
+   nFalAtu    := 0
+
+   // Variaveis do Salario
+
+   Salario := 0.00
+   SalHora := 0.00
+   SalDia  := 0.00
+   SalMes  := 0.00
+   nSalPg  := 0.00
+
+   If (Left(SRA->RA_CC,Len(AllTrim(cCCusInic))) < Alltrim(cCCusInic)) .Or. ;
+      (Left(SRA->RA_CC,Len(AllTrim(cCCusInic))) > Alltrim(cCCusFina))
+
+      dbSelectArea("SRA")
+      dbSkip()
+//      INCREGUA()
+      Loop
+   Endif
+
+// If (SRA->RA_SitFolh $ "A/F") ALTERADA PELA MEGA 25.11.99
+
+   If (SRA->RA_SitFolh $ "D/A")
+
+      dbSelectArea("SRA")
+      dbSkip()           
+//      INCREGUA()
+      Loop
+   Endif
+
+   dbSelectArea("SRJ")
+   IF dbSeek("  "+SRA->RA_CODFUNC)
+        ENCARGOS := SRJ->RJ_ENCARGO
+   ELSE
+        MSGSTOP("Erro na tabela de funcao. Nao existe a funcao "+SRA->RA_codfunc)
+   EndIf
+   dbSelectArea("SRA")
+   dbSelectArea("SRF")
+   dbSeek(SRA->RA_Filial+SRA->RA_Mat,.T.)
+
+   If (Eof()) .OR. SRA->RA_Mat<>SRF->RF_MAT
+      dbSelectArea("SRA")
+      dbSkip()
+//      INCREGUA()
+      Loop
+   EndIf
+
+   dbSelectArea("SRA")
+
+
+   If (! Sal_Min(@Val_SalMin,MesAno(dDataBase)))
+      dbSelectArea("SRA")
+      dbSkip()
+//	  INCREGUA()
+      Loop
+   EndIf
+
+   //ALTERACAO  PAULO 30.11.99
+   cCompl := "N"
+
+   If (Dow(dDataDemP) == 6)
+      nSabaDomi := 2
+   Else
+      nSabaDomi := 1
+   EndIf
+
+*   If ((GetMv("MV_SABDOM") == "S") .And. (nSabaDomi  == 2)) .Or. ;
+*      (Dow(dDataDemP) == 7)
+*
+*      If (MesAno(dDataDemP+nSabDom) > MesAno(dDataDemP))
+*         If (SRA->RA_CatFunc $ "M/C") .And. (Month(dDataDemP) <> 2)
+*            dDataDem := CtoD("30/"+Subs(DtoC(dDataDemP),4,5))
+*         Else
+*            dDataDem := CtoD(StrZero(F_Ultdia(dDataDemP),2)+'/'+Subs(DtoC(dDataDemP),4,5))
+*         Endif
+*      Else
+*         dDataDem := (dDataDemP + nSabaDomi)
+*      Endif
+*   Else
+      dDataDem := dDatademP
+*   Endif
+
+   If (! FP_CodFol(@aCodFol,SRA->RA_FILIAL))
+      dbSelectArea("SRA")
+      dbSkip()
+//         INCREGUA()
+      Loop
+   EndIf
+
+   Carr_Adts(aCodfol)
+
+   nPercEnca := 1
+
+   dbSelectArea("SRX")
+   dbSetOrder(1)
+   Set SoftSeek On
+   dbSeek(xFilial("SRX")+"14")
+   Set SoftSeek Off
+
+*   If FpHist82(SRA->RA_Filial,"14"," 11")   Esta bosta nao funciona !!!
+
+   If (! Eof())
+
+      nPercEnca  :=   Val(SubStr(SRX->RX_Txt,01,7)) ;
+                    + Val(SubStr(SRX->RX_Txt,08,7)) ;
+                    + Val(SubStr(SRX->RX_Txt,15,7))
+
+      nPercEnca := (nPercEnca / 100) + 1
+   Endif
+
+   aIncRes := {}
+
+   If FpHist82(SRA->RA_Filial,"32",cTipoReci)
+      Aadd(aIncRes,Subs(SRX->RX_Txt,31,1))  // 01 Indenizacao
+      Aadd(aIncRes,Subs(SRX->RX_Txt,32,1))  // 02 Aviso Previo
+      Aadd(aIncRes,Subs(SRX->RX_Txt,33,1))  // 03 13o. Sal Resc.
+      Aadd(aIncRes,Subs(SRX->RX_Txt,34,1))  // 04 Ferias Proporcional
+      Aadd(aIncRes,Subs(SRX->RX_Txt,35,1))  // 05 Fgts Mes Anterior
+      Aadd(aIncRes,Subs(SRX->RX_Txt,36,1))  // 06 Fgts Mes Rescisao
+      Aadd(aIncRes,Subs(SRX->RX_Txt,37,1))  // 07 Fgts Multa 40%
+      Aadd(aIncRes,Subs(SRX->RX_Txt,38,1))  // 08 Dsr s/ Med. Ferias
+      Aadd(aIncRes,Subs(SRX->RX_Txt,39,1))  // 09 Dsr s/ Med 13o.
+      Aadd(aIncRes,Subs(SRX->RX_Txt,40,1))  // 10 Dsr s/ Med Av. Previo
+      Aadd(aIncRes,Subs(SRX->RX_Txt,51,1))  // 11 Desconto de Ass.Medica
+      Aadd(aIncRes,Subs(SRX->RX_Txt,52,1))  // 12 Pagto. Multa Contr. Exp.
+      Aadd(aIncRes,Subs(SRX->RX_Txt,53,1))  // 13 Desc. Multa Contr. Exp.
+      Aadd(aIncRes,Subs(SRX->RX_Txt,54,1))  // 14 Multa Disp Antes Dissidio
+      Aadd(aIncRes,Subs(SRX->RX_Txt,55,1))  // 15 Saldo de Salario
+
+      nPercFgts  := Val(SubStr(SRX->RX_Txt,41,5)) / 100
+      cRescrais  := SubStr(SRX->RX_Txt,46,2)
+      cAfasfgts  := SubStr(SRX->RX_Txt,48,1)
+      Cod_Am     := SubStr(SRX->RX_Txt,49,2)
+   Else
+      dbSelectArea("SRA")
+      dbSkip()
+//         INCREGUA()
+
+      Loop
+   Endif
+
+   If nDiasAv == 0
+      nDiasAv := If (aIncRes[02] = 'I',30,nDiasAv)
+   Endif
+
+   If (! CompMes(@Normal,@Descanso,MesAno(dDataBase)))
+      dbSelectArea("SRA")
+      dbSkip()
+//         INCREGUA()
+
+      Loop
+   Endif
+
+   SvNormal    := Normal
+   SvDescanso  := Descanso
+
+   dbSelectArea("SR6")
+
+   If (xFilial("SR6") == "  ")
+      cFiliAuxi := "  "
+   Else
+      cFiliAuxi := SRA->RA_Filial
+   EndIf
+
+   dbSeek(cFiliAuxi+SRA->RA_TnoTrab)
+
+   If (! Eof())
+      Normal   := If (SR6->R6_HrNorma > 0 , SR6->R6_HrNorma,SvNormal)
+      Descanso := If (SR6->R6_HrDesc  > 0 , SR6->R6_HrDesc ,SvDescanso)
+      TurnoAnt := SRA->RA_TnoTrab
+   Endif
+
+   dbSelectArea("SRA")
+
+   If (Normal == 0) .Or. (Descanso == 0)
+      dbSelectArea("SRA")
+      dbSkip()
+//         INCREGUA()
+
+      Loop
+   Endif
+
+   // Funcao que Valoriza e Incorpora Salario
+
+   Salario := 0.00
+   SalHora := 0.00
+   SalDia  := 0.00
+   SalMes  := 0.00
+
+   fSalInc(@Salario,@SalMes,@SalHora,@Saldia)
+
+   aPd := {}
+
+   // Funcao que Carrega Variaveis do Movimento
+
+   FValoriza(@aPd,aCodFol,SalMes,SalDia,SalHora,Val_SalMin,Day(dDataDem),.F.)
+
+   // Busca no Arquivo SRS - Saldos FGTS o FGTS Depositado
+
+   If (aIncRes[7] == "S")
+      cNom := Alias()
+
+      dbSelectArea("SRS")
+      If (aCodfol[118,1] <> Space(3))
+         dbSeek(SRA->RA_Filial + SRA->RA_Mat)
+         While (! Eof())                          .And. ;
+               (SRS->RS_Filial == SRA->RA_Filial) .And. ;
+               (SRS->RS_Mat    == SRA->RA_Mat)
+
+            nFgtsDep := SRS->RS_SalAtu
+
+            dbSkip()
+         Enddo
+      EndIf
+
+      If (nFgtsDep > 0)
+         If Ascan(aPd,{ |X| X[1] = aCodFol[118,1] .And. X[9] <> "D" } ) == 0
+            fMatriz(aCodFol[118,1],nFgtsDep, , , ,"V","R")
+         EndIf
+      EndIf
+
+      dbSelectArea(cNom)
+   EndIf
+
+   If (aIncRes[5] == "S")
+      // Fgts Mes Anterior
+
+      nPos :=  Ascan(aPd,{|X| X[1] == aCodFol[18,1]})
+
+      If (nPos > 0) .And. (aCodfol[117,1] <> Space(3))
+         fMatriz(aCodFol[117,1],aPd[nPos,5])
+      Endif
+   Endif
+
+   // Regrava a Data de Demissao caso esteja Nula
+
+   AeVal(aPd,{ |X| If(X[10] = Nil , X[10] := dDataDem , X[10])})
+
+   // Verifica se Periodo de Ferias Ja foi Pago como ferias
+
+   dbSelectArea("SRH")
+   dbSeek(SRA->RA_FILIAL+SRA->RA_MAT+Dtos(SRF->RF_DATABAS))
+
+   If (! Eof())                           .And. ;
+      (SRH->RH_Filial  == SRA->RA_Filial) .And. ;
+      (SRH->RH_Mat     == SRA->RA_Mat)    .And. ;
+      (SRH->RH_DataBas == SRF->RF_DataBas)
+
+      If (MesAno(SRH->RH_DataIni) == MesAno(dDataDem))
+          nDFerPg := SRH->RH_DFerias+SRH->RH_DAbonPec+SRH->RH_DFaltas
+      EndIf
+   EndIf
+
+   dbSelectArea("SRF")
+
+   // Achar os dias de Ferias sem a parte indenizada de Aviso Previo
+
+   nDferv   := 0
+   nDfera   := 0
+   nDFerInd := 0
+
+   Calc_Fer(SRF->RF_DATABAS,dDataDem,@nDferv,@nDfera)
+//   DECI:=SRF->RF_VPRDTAT+SRF->RF_VINDTAT+SRF->RF_TADDTAT+SRF->RF_VFGDTAT+SRF->RF_par13at
+//   FERI:=SRF->RF_VPROVAT+SRF->RF_VIAPVAT+SRF->RF_VFGTVAT+SRF->RF_VPROAAT+SRF->RF_VIAPAAT+SRF->RF_VFGTAAT
+   DECI:=SRF->RF_VPRDTAT+SRF->RF_VINDTAT+SRF->RF_TADDTAT+SRF->RF_par13at
+   FERI:=SRF->RF_VPROVAT+SRF->RF_VPROVAT/3+SRF->RF_VIAPVAT+SRF->RF_VPROAAT+SRF->RF_VIAPAAT+SRF->RF_VPROAAT/3
+   dozeAVFERI:=FERI/12
+   dozeAVDECI:=DECI/12
+   DECI:=dozeAVDECI+DECI
+   FERI:=dozeAVFERI+FERI
+   // Funcao Para Calcular Dias Ferias Vencidas e Proporcionais  ³
+
+   nDferven := 0
+   nDferave := 0
+
+   Calc_Fer(SRF->RF_DataBas,dDataDem+If(aIncRes[2]$ "S/I",nDiasAv,0),@nDferven,@nDferave)
+
+   //  Achar dias de ferias indenizados
+
+   If nDferAve > 0
+      nDferInd := nDferave - nDfera
+   Elseif nDferven > 0
+      nDferInd := nDferVen - nDferv
+   Endif
+
+   // Verifica e Aplica a Tabela de Faltas
+
+   Calmed(@nfaltasv,@nFaltasp)
+
+   // Calcula as Faltas Proporcionais
+
+   nFaltasp := ((nFaltasp / 30) * nDferAve)
+
+   // Calculo de Ferias Dobrada
+
+   If ((nDFerVen / 30) > 1)
+      nDiasDb  := ((Int(nDFerVen / 30) - 1) * 30)
+      nDiasDb  := nDiasDb - SRF->RF_DfErant
+      nDFerVen := nDFerVen + nDiasDb
+   Endif
+
+   // Deducao de dias de ferias antecipadas
+
+   If (SRF->RF_DfErant > 0) .Or. (nDFerPg > 0)
+      If (nDferave > 0) .And. (nDferven == 0)
+         nDferave := nDferave - (SRF->RF_DfErant)
+         nDferave := nDferave - nDFerPg
+      ElseIf nDferven > 0
+         nDferven := nDferven - (SRF->RF_DfErant)
+         nDferven := nDferven - nDFerPg
+      Endif
+
+      nDferave := Iif(nDferave < 0,0,nDferave)
+      nDferven := Iif(nDferven < 0,0,nDferven)
+   Endif
+
+   a040Field  := {"RR_PD","RR_DESCPD","RR_TIPO1","RR_HORAS","RR_VALOR","RR_DATA","RR_TIPO2","RR_SEMANA"}
+   aM040Field := {"RG_SALMES ","RG_SALDIA ","RG_SALHORA","RG_DATAHOM","RG_DTAVISO","RG_DFERVEN","RG_DFERPRO","RG_DTGERAR","RG_DATADEM","RG_DAVISO ","RG_TIPORES","RG_SEMANA ","RG_NORMAL ","RG_DESCANS","RG_MEDATU "}
+
+   M->RG_SalMes  := SalMes
+   M->RG_SalDia  := SalDia
+   M->RG_SalHora := SalHora
+   M->RG_DferVen := nDferven - nFaltasv
+   M->RG_DferPro := nDferave - nFaltasp
+   M->RG_Mat     := SRA->RA_Mat
+   M->RG_DataDem := dDataDem
+   M->RG_TipoRes := cTipoReci
+   M->RG_DtGerar := dDataAvis
+   M->RG_DAviso  := nDiasAv
+   M->RG_DataHom := dDataHomo
+   M->RG_Nome    := SRA->RA_NOME
+   M->RG_Normal  := Normal
+   M->RG_Descans := Descanso
+   M->RG_MedAtu  := "N"
+   M->RG_Semana  := ""
+
+   aHeader  := {}
+   Continua :=.F.
+   nUsado   := 0
+   aCols    := {}
+
+   // Define campos para GetDados
+
+   dbSelectArea("SX3")
+   dbSeek("SRR")
+
+   While (! Eof()) .And. (SX3->X3_Arquivo == "SRR")
+      If (X3Uso(SX3->X3_Usado))                     .And. ;
+         (SX3->X3_Nivel <= cNivel)                  .And. ;
+         (AScan(a040Field,Trim(SX3->X3_Campo)) > 0)
+
+         nUsado := nUsado + 1
+         AADD(aHeader,{TRIM(SX3->X3_Titulo), ;
+                            SX3->X3_Campo,   ;
+                            SX3->X3_Picture, ;
+                            SX3->X3_Tamanho, ;
+                            SX3->X3_Decimal, ;
+                            SX3->X3_Valid,   ;
+                            SX3->X3_Usado,   ;
+                            SX3->X3_Tipo,    ;
+                            SX3->X3_Arquivo})
+      EndIf
+
+      dbSelectArea("SX3")
+      dbSkip()
+   EndDo
+
+   // Inicializa Vetor para GetDados
+
+   nCnt1  := 0
+   nUso   := nUsado
+   nUsado := 0
+
+   GerCols()
+   CalResu()
+   GrvResu()
+
+   dbSelectArea("SRA")
+   dbSkip()        
+//   INCREGUA()
+EndDo
+
+Return
+
+
+
+// Substituido pelo assistente de conversao do AP5 IDE em 04/04/00 ==> Function GerCols
+Static Function GerCols()
+/*
+*****************************************************************************
+*
+*
+***
+  */
+  
+aVirtual  := {}
+
+cVerbAdic := aCodFol[01,1]+"/"+aCodFol[02,1]+"/"+aCodFol[03,1]+"/"+aCodFol[04,1]+"/"+aCodFol[05,1]+"/"+;
+             aCodFol[36,1]+"/"+aCodFol[37,1]+"/"+aCodFol[38,1]+"/"+aCodFol[39,1]
+
+If (Len(aPd) == 0)
+   aCols1 := Array(1,nUso+1)
+Endif
+
+If Len(aPd) > 0
+   // Apagar do Array as Verbas de Adicionais
+
+   aPd1 := {}
+
+   Aeval(aPd,{|X| If (! x[1]$ cVerbAdic .Or. (x[1]$ cVerbAdic .And. x[7] == "I"),Aadd(aPd1,x),"") } )
+
+   aPd := {}
+   aPd := aClone(aPd1)
+
+   nCnt := Len(aPd)
+
+   // Verifica em que posicao se encontra na matriz aCols
+
+   nPos0 := Ascan(aHeader,{|X| X[2] = "RR_PD     " })
+   nPos1 := Ascan(aHeader,{|X| X[2] = "RR_VALOR  " })
+   nPos2 := Ascan(aHeader,{|X| X[2] = "RR_HORAS  " })
+   nPos3 := Ascan(aHeader,{|X| X[2] = "RR_DESCPD " })
+   nPos4 := Ascan(aHeader,{|X| X[2] = "RR_TIPO1  " })
+   nPos5 := Ascan(aHeader,{|X| X[2] = "RR_TIPO2  " })
+   nPos6 := Ascan(aHeader,{|X| X[2] = "RR_DATA   " })
+   nPos7 := Ascan(aHeader,{|X| X[2] = "RR_SEMANA " })
+   nElem := Len(aPd)
+   nCol  := nUso + 1
+
+   aCols1 := Array(IIf(nElem > 0 ,nElem,1),nCol)
+
+   For N := 1 To nElem
+      aCols1[N,nPos0]  := aPd[N,1]
+      aCols1[N,nPos1] := Round(aPd[N,5],2)
+      aCols1[N,nPos2] := aPd[N,4]
+      aCols1[N,nPos4] := aPd[N,6]
+      aCols1[N,nPos5] := aPd[N,7]
+      aCols1[N,nPos3] := DescPd(aPd[N,1])
+      aCols1[N,nPos6] := aPd[N,10]
+      aCols1[N,nPos7] := aPd[N,3]
+      aCols1[N,nUso+1]:= If (aPd[N,9] = "D",.T.,.F.)
+   Next
+
+   aCols1 := aSort(aCols1,,,{ |x,y| x[nPos0] < y[nPos0] })
+   nUsado := 8
+Endif
+
+If (Len(aCols1) == 1) .And. (aCols1[1,1] = Nil)
+   nUsado := 0
+
+   dbSelectArea("SX3")
+   dbSeek("SRR")
+
+   While (! Eof()) .And. (SX3->X3_Arquivo == "SRR")
+
+      If (X3Uso(SX3->X3_Usado))                     .And. ;
+         (cNivel >= SX3->X3_Nivel)                  .And. ;
+         (aScan(a040Field,Trim(SX3->X3_CAMPO)) > 0)
+
+         nUsado := nUsado + 1
+
+         // Monta array de 1 elemento vazio. Se inclusao.
+
+         If (SX3->X3_Context == "V")
+            aCols1[1][nUsado] := CriaVar(AllTrim(SX3->X3_CAMPO))
+            Aadd( aVirtual , AllTrim(SX3->X3_CAMPO) )
+         EndIf
+
+         If (SX3->X3_Tipo == "C")
+            aCols1[1][nUsado] := SPACE(SX3->X3_TAMANHO)
+         Elseif X3_TIPO == "N"
+            aCols1[1][nUsado] := 0
+         Elseif X3_TIPO == "D"
+            aCols1[1][nUsado] := CTOD("")
+         Else
+            aCols1[1][nUsado] := .F.
+         EndIf
+      EndIf
+      dbSkip()
+   EndDo
+
+   aCols1[1,nUsado+1] := .T.
+Endif
+
+aCols := aCols1
+
+Return
+
+
+
+// Substituido pelo assistente de conversao do AP5 IDE em 04/04/00 ==> Function CalResu
+Static Function CalResu()
+*****************************************************************************
+*
+*
+***
+
+// Variaveis que Carregam do arquivo de Medias
+
+nAvosFal13 := 0        // Avos de Reducao Faltas 13o
+lMesAtu    := .F.
+
+// Variavel Mes de Dissidio
+
+cMesDiss  := "  "      // Mes do Dissidio
+nMesADiss := 0
+
+// Variaveis Salario Familia
+
+nLimSF1  := 0.00
+nVal_SF1 := 0.00
+nLimSF2  := 0.00
+nVal_SF2 := 0.00
+
+// Variaveis Dias Afastados
+
+nDiasAfas := 0
+nDiasMat  := 0
+nDiasAc   := 0
+nDiasAd   := 0
+nDiasFgts := 0
+Diastrab  := 0
+DiasDsr   := 0
+nDiasEnf  := 0
+
+// Variaveis Assistencia Medica
+
+Titular   := 0.00
+Depasme   := 0.00
+Percasm   := 0.00
+nVlrPlano := 0.00
+
+nLim1 := 0.00
+nLim2 := 0.00
+nLim3 := 0.00
+nLim4 := 0.00
+nLim5 := 0.00
+nLim6 := 0.00
+
+nPercf1 := 0.00
+nPercf2 := 0.00
+nPercf3 := 0.00
+nPercf4 := 0.00
+nPercf5 := 0.00
+nPercf6 := 0.00
+
+nPercd1 := 0.00
+nPercd2 := 0.00
+nPercd3 := 0.00
+nPercd4 := 0.00
+nPercd5 := 0.00
+nPercd6 := 0.00
+
+CalcAsmed := .F.
+
+aRoteiro   := {}
+cRoteiro   := "RES"
+aTabIr     := Array(5,3)           // Tabela de Ir
+aTInss     := Array(3,3)           // Tabela de Inss
+nValArred  := 0.00
+nMedFerv   := 0.00
+nMedFerp   := 0.00
+nMed13o    := 0.00
+nMed13oA   := 0.00
+nMedAviso  := 0.00
+nFgtsCt1   := 0
+nFgtsCt2   := 0
+aSeguro    := {}
+aConvencao := {}
+cMedSind   := ""
+nFgts_b    := 0.00
+nFgts13_b  := 0.00
+
+// CARREGANDO A TABELA DO I.R.
+
+If (! CargaIr(@aTabIr,MesAno(M->RG_DataHoM)))
+   Return
+ENDIF
+
+// TABELA DO INSS
+
+If (! Car_inss(@aTInss,MesAno(dDataBase)))
+   Return
+EndIf
+
+// TABELA DO INSS EMPRESA (BUSCAR PERCENTUAL FGTS)
+
+fCarFgts(@nFgtsCt1,@nFgtsCt2,SRA->RA_Filial)
+
+//  SALARIO FAMILIA
+//msgstop("OK")
+//MSGstop(@nLimSF1,@nVal_SF1,@nLimSF2,@nVal_SF2,MesAno(dDataBase))
+//MSGSTOP(SRA->RA_SALARIO,SRA->RA_SITFOLH,SRA->RA_DEPSF)
+
+//IF VAL(SRA->RA_DEPSF) > 0
+
+If (! Sal_Fami(@nLimSF1,@nVal_SF1,@nLimSF2,@nVal_SF2,MesAno(dDataBase)))
+   Return(aCols)
+EndIf
+
+//ENDIF
+
+// SEGURO DE VIDA
+
+Seg_Vida(@aSeguro,SRA->RA_Filial)
+
+// CONVENCAO COLETIVA
+
+Conv_Cole(@aConvencao,SRA->RA_Filial)
+
+// CARREGA TABELA ASSISTENCIA MEDICA
+
+CarAssMed()
+
+// Parametro Sindicato         - Mes de Dissidio / Qual Media
+
+If FPHIST82(SRA->RA_Filial,"04","00"+SRA->RA_Sindical)
+   cMedSind  := SubStr(SRX->RX_Txt, 45 , 4 )
+   cMesDiss  := SubStr(SRX->RX_Txt, 41 , 2 )
+Else
+   cMedSind  := "NNNN"
+   cMesDiss  := ""
+Endif
+
+nMesADiss := If(Val(cMesDiss) - 1 > 0,Val(cMesDiss) - 1,12)
+
+// CARREGANDO ROTEIRO DE CALCULO
+
+aRoteiro := {}
+lCarRote := .T.
+
+CarRote()
+
+If (! lCarRote)
+   Return
+Endif
+
+// VERIFICA A POSICAO DOS CAMPOS NA MATRIZ DE CABECALHO
+
+nPos0 := Ascan(aHeader,{|X| X[2] = "RR_PD     " })
+nPos1 := Ascan(aHeader,{|X| X[2] = "RR_VALOR  " })
+nPos2 := Ascan(aHeader,{|X| X[2] = "RR_HORAS  " })
+nPos3 := Ascan(aHeader,{|X| X[2] = "RR_DESCPD " })
+nPos4 := Ascan(aHeader,{|X| X[2] = "RR_TIPO1  " })
+nPos5 := Ascan(aHeader,{|X| X[2] = "RR_TIPO2  " })
+nPos6 := Ascan(aHeader,{|X| X[2] = "RR_DATA   " })
+nPos7 := Ascan(aHeader,{|X| X[2] = "RR_SEMANA " })
+
+// PREENCHE A MATRIZ aPd ATRAVES DA MATRIZ aCols DIGITADA
+
+aPd  := {}
+aPdv := {}
+
+// IGUALA A VARIAVEL cSemana A SEMANA DIGITADA
+
+cSemana := M->RG_Semana
+
+For n := 1 to Len(aCols)
+   If (aCols[n,nUso+1] == .F.) .And. (aCols[n,nPos0] <> "   ")
+      // Gravar no Array aPd
+      FMatriz(aCols[n,nPos0],aCols[n,nPos1],aCols[n,nPos2],aCols[n,nPos7],SRA->RA_CC,aCols[n,nPos4],If (aCols[n,nPos5] == " ","I",aCols[n,nPos5]),0," ",aCols[n,nPos6])
+   Endif
+Next
+
+// Variavel que define se considera o Mes para media por sindicato.
+
+lMesAtu := If (M->RG_MEDATU == "S" , .T. , .F.)
+
+// D.S.R. HORA EXTRA
+
+nDsr_hrex := 0.00
+Dsr_hhex  := 0.00
+
+// BUSCA AS MEDIAS NO ARQUIVO TRP E CALCULA DSR
+
+nMedFerv  := 0.00
+nMedFerp  := 0.00
+nMed13o   := 0.00
+nMed13oA  := 0.00
+nMedAviso := 0.00
+nDesc13   := 0.00
+
+// CALCULA SALARIO FAMILIA
+
+nSal_fami := 0.00
+
+// CALCULA CONTRIBUICAO SINDICAL
+
+nContri := 0.00
+
+//CALCULA SEGURO DE VIDA
+
+nSeguro  := 0.00
+nSegEmp  := 0.00
+Seguro_B := 0.00
+
+// SOMA AS VERBAS DE PROVENTO
+
+nValProv := 0.00
+
+// SOMA AS VERBAS DE DESCONTO
+
+nValDesc := 0.00
+
+// Limpa Arquivo par Calcular Medias
+
+dbSelectArea("TRP")
+Zap
+
+// EXECUTA AS FORMULAS ROTEIRO
+
+If (! FFormulas(aRoteiro,@lContinua))
+   Return
+Endif
+
+// GRAVA NA MATRIZ PARA APRESENTAR NA TELA
+
+nElem := Len(aPd)
+
+// CONTA OS ELEMENTOS VALIDOS PARA MONTAR O NOVO aCols
+
+nElem1 := 0
+aEval(aPd,{ |X| nElem1 := nElem1 + If( Round(x[5],2) == 0.00 .Or. X[9] == "D" .Or. (x[3] <> Space(2) .And. x[3] <> M->RG_SEMANA) ,0 ,1) })
+
+nCol   := nUso + 1
+aCols1 := Array(If(nElem1 > 0,nElem1,1),nCol)
+nPd    := 0
+
+If (nElem1 > 0)
+   For N := 1 To nElem
+      If (Round(aPd[N,5],2) == 0.00) .Or. ;
+         (aPd[n,9] == "D")           .Or. ;
+        ((aPd[n,3] <> Space(2)) .And. (aPd[n,3] <> M->RG_SEMANA))
+
+         Loop
+      Endif
+
+      nPd := nPd + 1
+      aCols1[nPd,nPos0] := aPd[N,1]
+      aCols1[nPd,nPos1] := Round(aPd[N,5],2)
+      aCols1[nPd,nPos2] := aPd[N,4]
+      aCols1[nPd,nPos4] := aPd[N,6]
+      aCols1[nPd,nPos5] := aPd[N,7]
+      aCols1[nPd,nPos3] := DescPd(aPd[N,1])
+      aCols1[nPd,nPos7] := aPd[N,3]
+
+      If Empty(aPd[N,10])
+         aCols1[nPd,nPos6] := M->RG_DataHoM
+      Else
+         aCols1[nPd,nPos6] := aPd[N,10]
+      Endif
+
+      aCols1[nPd,nUso+1]    := .F.
+   Next
+Else
+   aCols1[1,nPos0]  := aCodFol[126,1]
+   aCols1[1,nPos1]  := 0.01
+   aCols1[1,nPos2]  := 0.00
+   aCols1[1,nPos4]  := "V"
+   aCols1[1,nPos5]  := "R"
+   aCols1[1,nPos3]  := DescPd(aCodFol[126,1])
+   aCols1[1,nPos7]  := M->RG_Semana
+   aCols1[1,nPos6]  := M->RG_DataHoM
+   aCols1[1,nUso+1] := .F.
+EndIf
+
+aCols := aSort(aCols1,,,{|x,y| x[nPos0] < y[nPos0] })
+
+Return
+
+
+
+// Substituido pelo assistente de conversao do AP5 IDE em 04/04/00 ==> Function CarRote
+Static Function CarRote()
+*****************************************************************************
+* Carrega o roteiro de calculos
+*
+***
+
+cFilAnte := ""
+
+If (! FCHKSRM(SRA->RA_Filial))
+   lCarRote := .F.
+   Return
+Endif
+
+// Retorna quando nao encontrar a formula no arquivo de formulas
+
+dbSelectArea("SRM")
+
+If (! dbSeek( SRA->RA_Filial + cRoteiro))
+   If (! dbSeek("  "+ cRoteiro))
+*      HELP(" ",1,"GPESROTEIR")
+      lCarRote := .F.
+      Return
+   EndIf
+EndIf
+
+nSeq      := 0
+nContador := 0
+cFilAnte  := SRM->RM_FILIAL
+aRoteiro  := {}
+
+While (! Eof())                       .And. ;
+      (SRM->RM_Filial  == cFilAnte)   .And. ;
+      (SRM->RM_Calculo == cRoteiro)
+
+   If (nSeq <> Val(SRM->RM_Seq))
+      nContador := nContador + 1
+      Aadd(aRoteiro , {SRM->RM_Seq, AllTrim(SRM->RM_IF), AllTrim(SRM->RM_Formula), AllTrim(SRM->RM_False)})
+      nSeq := Val(SRM->RM_Seq)
+   Else
+      If (! Empty(Alltrim(RM_IF)))
+         aRoteiro[nContador,2] := If(Empty(aRoteiro[nContador,2]),AllTrim(SRM->RM_IF),aRoteiro[nContador,2]+" "+Alltrim(SRM->RM_IF))
+      EndIf
+      If (! Empty(Alltrim(SRM->RM_FORMULA)))
+         aRoteiro[nContador,3] := If(Empty(aRoteiro[nContador,3]),AllTrim(SRM->RM_FORMULA),aRoteiro[nContador,3]+CHR(254)+Alltrim(SRM->RM_FORMULA))
+      EndIf
+      If (! Empty(Alltrim(SRM->RM_FALSE)))
+         aRoteiro[nContador,4] := If(Empty(aRoteiro[nContador,4]),AllTrim(SRM->RM_FALSE),aRoteiro[nContador,4]+CHR(254)+Alltrim(SRM->RM_FALSE))
+      EndIf
+   EndIf
+
+   dbSkip()
+EndDo
+
+For nFor := 1 TO Len(aRoteiro)
+   If (Val(aRoteiro[nFor,3])  > 0)
+      dbSelectArea("SM4")
+      If dbSeek(SRA->RA_Filial + AllTrim(aRoteiro[nFor,3]))
+         aRoteiro[nFor,3] := SM4->M4_Formula
+      ElseIf dbSeek("  " + AllTrim(aRoteiro[nFor,3]) )
+         aRoteiro[nFor,3] := SM4->M4_Formula
+      EndIf
+   EndIf
+
+   If (Val(aRoteiro[nFor,4])  > 0)
+      dbSelectArea("SM4")
+      If dbSeek(SRA->RA_Filial + AllTrim(aRoteiro[nFor,4]))
+         aRoteiro[nFor,4] := SM4->M4_Formula
+      ElseIf dbSeek( "  " + ALLTRIM(aRoteiro[nFor,4]))
+         aRoteiro[nFor,4] := SM4->M4_Formula
+      EndIf
+   EndIf
+
+   If (Len(aRoteiro[nFor,2]) > 256) .Or. ;
+      (Len(aRoteiro[nFor,3]) > 256) .Or. ;
+      (Len(aRoteiro[nFor,4]) > 256)
+
+*      HELP(" ",1,"GPEMAIO256")
+      lCarRote := .F.
+      Return
+      // HELP MAIOR QUE 256 CARACTERES
+   EndIf
+Next
+
+Return
+
+
+
+// Substituido pelo assistente de conversao do AP5 IDE em 04/04/00 ==> Function GrvResu
+Static Function GrvResu()
+****************************************************************************
+* Grava os calculos realizados
+*
+***
+
+nSaldFGTS := 0
+nValrAvis := 0
+nValrFeri := 0
+nValrDeci := 0
+nValrFGTS := 0
+nValrIden := 0
+nValrTota := 0
+nAvosDeci := 0
+nAvosFeri := 0
+
+For nContAuxi := 1 To Len(aCols)
+   lGrava := .F.
+
+   If (! aCols[nContAuxi,nUso+1])
+
+      cCodiVerb := aCols[nContAuxi,nPos0]
+      nValrVerb := aCols[nContAuxi,nPos1]
+      nHoraVerb := aCols[nContAuxi,nPos2]
+
+      Do Case
+         Case (cCodiVerb == "736")
+            nSaldFGTS := nValrVerb
+            lGrava    := .T.
+
+        Case (cCodiVerb == "129")
+           nValrAvis := nValrVerb
+           lGrava    := .T.
+
+         Case (cCodiVerb $ "122/123")
+            nValrFeri := nValrFeri + nValrVerb
+            nAvosFeri := nAvosFeri + nHoraVerb
+            lGrava    := .T.
+
+         Case (cCodiVerb == "138")
+            nValrFeri := nValrFeri + nValrVerb
+            lGrava    := .T.
+
+         Case (cCodiVerb == "131")
+            nValrDeci := nValrDeci + nValrVerb
+            nAvosDeci := nAvosDeci + nHoraVerb
+            lGrava    := .T.
+
+         Case (cCodiVerb == "115")
+
+            If (dDataDem < CToD("20/12/" + SubStr(DToC(dDataDem),7)))
+               nValrDeci := nValrDeci + (nValrVerb * nPercEnca)
+               nAvosDeci := nAvosDeci + nHoraVerb
+               lGrava    := .T.
+            EndIf
+
+         Case (cCodiVerb $ "728/758")
+            nValrFGTS := nValrFGTS + nValrVerb
+            lGrava    := .T.
+
+         Case (cCodiVerb == "756")
+            nValrIden := nValrIden + nValrVerb
+            lGrava    := .T.
+      EndCase
+   EndIf
+Next
+
+If (Mod(Year(dDataBase),4) == 0)
+   nDiasAno := 366
+Else
+   nDiasAno := 365
+EndIf
+
+If (Month(dDataDem) == 2)
+   If (Day(dDataDem) == F_UltDia(dDataDemP))
+      nDiasCalc := 30
+   Else
+      nDiasCalc := Day(dDataDem)
+   EndIf
+Else
+   If (Day(dDataDem) > 30)
+      nDiasCalc := 30
+   Else
+      nDiasCalc := Day(dDataDem)
+   EndIf
+EndIf
+
+nValrFeri:=feri
+nValrDeci:=deci
+nValrFGTS:=(nValrAvis*2*8/100)+SRF->RF_VFGDTAT+SRF->RF_VFGTVAT+SRF->RF_VFGTAAT+dozeAVFERI*8/100+dozeAVDECI*8/100
+nValrIden:=(nSaldFGTS+nValrFGTS)*40/100
+
+IF ENCARGOS <> "S"
+        nValrAvis  :=  0
+        nValrFeri  :=  0
+        nValrDeci  :=  0
+        nValrFGTS  :=  0
+        nValrIden  :=  0
+ENDIF
+
+dbSelectArea("TRBI")
+RecLock("TRBI",.T.)
+Replace  CodiCCus  With  SRA->RA_CC
+Replace  CodiFunc  With  SRA->RA_Mat
+Replace  NomeFunc  With  SRA->RA_Nome
+Replace  DataVenc  With  SRF->RF_DataBas + nDiasAno
+Replace  DataAdmi  With  SRA->RA_Admissa
+Replace  SalaBase  With  SRA->RA_Salario
+Replace  SaldFGTS  With  nSaldFGTS
+Replace  AvosFeri  With  nAvosFeri
+Replace  AvosDeci  With  nAvosDeci
+Replace  ValrRemu  With  (((SRA->RA_Salario / 30) * nDiasCalc) * nPercEnca)
+Replace  ValrAvis  With  nValrAvis
+Replace  ValrFeri  With  nValrFeri
+Replace  ValrDeci  With  nValrDeci
+Replace  ValrFGTS  With  nValrFGTS
+Replace  ValrIden  With  nValrIden
+Replace  ValrTota  With  TRBI->ValrRemu+nValrAvis+nValrFeri+nValrDeci+nValrFGTS+nValrIden
+MsUnlock()
+
+Return
+
+
+
+// Substituido pelo assistente de conversao do AP5 IDE em 04/04/00 ==> Function Imprime
+Static Function Imprime()
+****************************************************************************
+*  Realiza a impressao de dados
+*
+***
+
+nRemuTotC := 0
+nAvisTotC := 0
+nFeriTotC := 0
+nDeciTotC := 0
+nFGTSTotC := 0
+nIdenTotC := 0
+nTotaGerC := 0
+
+nRemuTota := 0
+nAvisTota := 0
+nFeriTota := 0
+nDeciTota := 0
+nFGTSTota := 0
+nIdenTota := 0
+nTotaGera := 0
+
+dbSelectArea("TRBI")
+dbGoTop()
+
+If (! Eof())
+   @ 00,000 PSAY Chr(15)
+
+   While (! Eof())
+
+     cCCusAnte := TRBI->CodiCCus
+     ImprCabC()
+
+     While (! Eof())                     .And. ;
+           (TRBI->CodiCCus == cCCusAnte)
+
+        ImprDeta()
+
+        dbSelectArea("TRBI")
+        dbSkip()
+     EndDo
+     ImprTotC()
+   EndDo
+
+   ImprTota()
+   ImprRoda()
+EndIf
+
+Return
+
+
+// Substituido pelo assistente de conversao do AP5 IDE em 04/04/00 ==> Function ImprCabr
+Static Function ImprCabr()
+*****************************************************************************
+* Imprime cabecalho (Funcionario)
+*
+***
+
+Cabec(titulo,cabec1,cabec2,nomeprog,tamanho,15)
+
+@ 05,001 PSAY "Funcionario                              Dt. Venc.  Admissao    Salario Base      Saldo FGTS  Avos Fer.  Avos 13o."
+@ 06,030 PSAY "Remuneracao  Aviso Previo         Ferias   13o. Salario           FGTS    Indenizacao           Total"
+
+nContLinh := 08
+
+/*
+Funcionario                              Dt. Venc.  Admissao    Salario Base      Saldo FGTS  Avos Fer.  Avos 13o.
+                             Remuneracao  Aviso Previo         Ferias   13o. Salario           FGTS    Indenizacao           Total
+
+999999 - XxxxxxxxxxXxxxxxxxxxXxxxxxxxxx  99/99/99   99/99/99  999,999,999.99  999,999,999.99     99         99
+                          99,999,999.99  99,999,999.99  99,999,999.99  99,999,999.99  99,999,999.99  99,999,999.99  999,999,999.99
+*/
+
+Return
+
+
+
+// Substituido pelo assistente de conversao do AP5 IDE em 04/04/00 ==> Function ImprCabC
+Static Function ImprCabC()
+*****************************************************************************
+* Imprime detalhe (Verba)
+*
+***
+
+If (nContLinh > nMaxiLinh - 3)
+   If (m_pag <> 1)
+      ImprRoda()
+   EndIf
+
+   ImprCabr()
+EndIf
+if MCONTAB=="CON"
+	dbSelectAreA("SI3")
+	dbSetOrder(1)
+	dbSeek(xFilial("SI3")+cCCusAnte)
+	I3Desc:=SI3->I3_Desc
+	I3TIPOCC == SI3->I3_TIPOCC 
+ELSE
+	dbSelectAreA("CTT")
+	dbSetOrder(1)
+	dbSeek(xFilial("CTT")+cCCusAnte)
+	I3Desc:=CTT->CTT_DESC01
+	I3TIPOCC == CTT->CTT_TIPOCC
+ENDIF
+@ nContLinh, 001 PSAY "Centro de Custo : " + cCCusAnte + " - " + I3Desc
+
+nContLinh := nContLinh + 2
+
+dbSelectArea("TRBI")
+
+Return
+
+
+
+// Substituido pelo assistente de conversao do AP5 IDE em 04/04/00 ==> Function ImprDeta
+Static Function ImprDeta()
+*****************************************************************************
+* Imprime detalhe (Verba)
+*
+***
+
+If (nContLinh > nMaxiLinh - 3)
+   If (m_pag <> 1)
+      ImprRoda()
+   EndIf
+
+   ImprCabr()
+   ImprCabC()
+EndIf
+
+@ nContLinh, 001 PSAY TRBI->CodiFunc
+@ nContLinh, 008 PSAY "-"
+@ nContLinh, 010 PSAY TRBI->NomeFunc
+@ nContLinh, 042 PSAY TRBI->DataVenc
+@ nContLinh, 053 PSAY TRBI->DataAdmi
+@ nContLinh, 063 PSAY TRBI->SalaBase  Picture "@RE 999,999,999.99"
+@ nContLinh, 079 PSAY TRBI->SaldFGTS  Picture "@RE 999,999,999.99"
+@ nContLinh, 098 PSAY TRBI->AvosFeri  Picture "@RE 99"
+@ nContLinh, 109 PSAY TRBI->AvosDeci  Picture "@RE 99"
+
+@ nContLinh+1, 027 PSAY TRBI->ValrRemu  Picture  "@RE 99,999,999.99"
+@ nContLinh+1, 042 PSAY TRBI->ValrAvis  Picture  "@RE 99,999,999.99"
+@ nContLinh+1, 057 PSAY TRBI->ValrFeri  Picture  "@RE 99,999,999.99"
+@ nContLinh+1, 072 PSAY TRBI->ValrDeci  Picture  "@RE 99,999,999.99"
+@ nContLinh+1, 087 PSAY TRBI->ValrFGTS  Picture  "@RE 99,999,999.99"
+@ nContLinh+1, 102 PSAY TRBI->ValrIden  Picture  "@RE 99,999,999.99"
+@ nContLinh+1, 117 PSAY TRBI->ValrTota  Picture  "@RE 999,999,999.99"
+
+
+nRemuTotC := nRemuTotC + TRBI->ValrRemu
+nAvisTotC := nAvisTotC + TRBI->ValrAvis
+nFeriTotC := nFeriTotC + TRBI->ValrFeri
+nDeciTotC := nDeciTotC + TRBI->ValrDeci
+nFGTSTotC := nFGTSTotC + TRBI->ValrFGTS
+nIdenTotC := nIdenTotC + TRBI->ValrIden
+nTotaGerC := nTotaGerC + TRBI->ValrTota
+
+nRemuTota := nRemuTota + TRBI->ValrRemu
+nAvisTota := nAvisTota + TRBI->ValrAvis
+nFeriTota := nFeriTota + TRBI->ValrFeri
+nDeciTota := nDeciTota + TRBI->ValrDeci
+nFGTSTota := nFGTSTota + TRBI->ValrFGTS
+nIdenTota := nIdenTota + TRBI->ValrIden
+nTotaGera := nTotaGera + TRBI->ValrTota
+
+if tipomov == 2
+	 GravaSzdMes()
+endif
+nContLinh := nContLinh + 2
+
+/*
+Funcionario                              Dt. Venc.  Admissao    Salario Base      Saldo FGTS  Avos Fer.  Avos 13o.     Remuneracao
+                                          Aviso Previo         Ferias   13o. Salario           FGTS    Indenizacao           Total
+
+999999 - XxxxxxxxxxXxxxxxxxxxXxxxxxxxxx  99/99/99   99/99/99  999,999,999.99  999,999,999.99     99         99      999,999,999.99
+                                         99,999,999.99  99,999,999.99  99,999,999.99  99,999,999.99  99,999,999.99  999,999,999.99
+*/
+
+Return
+
+
+
+// Substituido pelo assistente de conversao do AP5 IDE em 04/04/00 ==> Function ImprTotC
+Static Function ImprTotC()
+*****************************************************************************
+* Imprime Total
+*
+***
+
+If (nContLinh > nMaxiLinh - 3)
+   If (m_pag <> 1)
+      ImprRoda()
+   EndIf
+
+   ImprCabr()
+   ImprCabC()
+EndIf
+
+@ nContLinh, 027 PSAY "-------------"
+@ nContLinh, 042 PSAY "-------------"
+@ nContLinh, 057 PSAY "-------------"
+@ nContLinh, 072 PSAY "-------------"
+@ nContLinh, 087 PSAY "-------------"
+@ nContLinh, 102 PSAY "-------------"
+@ nContLinh, 117 PSAY "--------------"
+
+@ nContLinh+1, 001 PSAY "Total " + cCCusAnte
+@ nContLinh+1, 027 PSAY nRemuTotC  Picture  "@RE 99,999,999.99"
+@ nContLinh+1, 042 PSAY nAvisTotC  Picture  "@RE 99,999,999.99"
+@ nContLinh+1, 057 PSAY nFeriTotC  Picture  "@RE 99,999,999.99"
+@ nContLinh+1, 072 PSAY nDeciTotC  Picture  "@RE 99,999,999.99"
+@ nContLinh+1, 087 PSAY nFGTSTotC  Picture  "@RE 99,999,999.99"
+@ nContLinh+1, 102 PSAY nIdenTotC  Picture  "@RE 99,999,999.99"
+@ nContLinh+1, 117 PSAY nTotaGerC  Picture  "@RE 999,999,999.99"
+if tipomov = 2 
+	GravaSZDCC()   	
+endif
+nRemuTotC := 0
+nAvisTotC := 0
+nFeriTotC := 0
+nDeciTotC := 0
+nFGTSTotC := 0
+nIdenTotC := 0
+nTotaGerC := 0
+
+nContLinh := nContLinh + 3
+
+/*
+Funcionario                              Dt. Venc.  Admissao    Salario Base      Saldo FGTS  Avos Fer.  Avos 13o.     Remuneracao
+                                          Aviso Previo         Ferias   13o. Salario           FGTS    Indenizacao           Total
+
+999999 - XxxxxxxxxxXxxxxxxxxxXxxxxxxxxx  99/99/99   99/99/99  999,999,999.99  999,999,999.99     99         99      999,999,999.99
+                                         99,999,999.99  99,999,999.99  99,999,999.99  99,999,999.99  99,999,999.99  999,999,999.99
+*/
+
+Return
+
+
+
+// Substituido pelo assistente de conversao do AP5 IDE em 04/04/00 ==> Function ImprTota
+Static Function ImprTota()
+*****************************************************************************
+* Imprime Total
+*
+***
+
+If (nContLinh > nMaxiLinh - 3)
+   If (m_pag <> 1)
+      ImprRoda()
+   EndIf
+
+   ImprCabr()
+EndIf
+
+@ nContLinh, 027 PSAY "-------------"
+@ nContLinh, 042 PSAY "-------------"
+@ nContLinh, 057 PSAY "-------------"
+@ nContLinh, 072 PSAY "-------------"
+@ nContLinh, 087 PSAY "-------------"
+@ nContLinh, 102 PSAY "-------------"
+@ nContLinh, 117 PSAY "--------------"
+
+@ nContLinh+1, 001 PSAY "Total Geral"
+@ nContLinh+1, 027 PSAY nRemuTota  Picture  "@RE 99,999,999.99"
+@ nContLinh+1, 042 PSAY nAvisTota  Picture  "@RE 99,999,999.99"
+@ nContLinh+1, 057 PSAY nFeriTota  Picture  "@RE 99,999,999.99"
+@ nContLinh+1, 072 PSAY nDeciTota  Picture  "@RE 99,999,999.99"
+@ nContLinh+1, 087 PSAY nFGTSTota  Picture  "@RE 99,999,999.99"
+@ nContLinh+1, 102 PSAY nIdenTota  Picture  "@RE 99,999,999.99"
+@ nContLinh+1, 117 PSAY nTotaGera  Picture  "@RE 999,999,999.99"
+
+nRemuTota := 0
+nAvisTota := 0
+nFeriTota := 0
+nDeciTota := 0
+nFGTSTota := 0
+nIdenTota := 0
+nTotaGera := 0
+
+nContLinh := nContLinh + 2
+
+/*
+Funcionario                              Dt. Venc.  Admissao    Salario Base      Saldo FGTS  Avos Fer.  Avos 13o.     Remuneracao
+                                          Aviso Previo         Ferias   13o. Salario           FGTS    Indenizacao           Total
+
+999999 - XxxxxxxxxxXxxxxxxxxxXxxxxxxxxx  99/99/99   99/99/99  999,999,999.99  999,999,999.99     99         99      999,999,999.99
+                                         99,999,999.99  99,999,999.99  99,999,999.99  99,999,999.99  99,999,999.99  999,999,999.99
+*/
+
+Return
+
+
+
+// Substituido pelo assistente de conversao do AP5 IDE em 04/04/00 ==> Function ImprRoda
+Static Function ImprRoda()
+*****************************************************************************
+* Imprime Rodape
+*
+***
+
+@ 60, 000 PSAY Replicate("-",132)
+
+Return
+
+Static Function GravaSzdMes()
+*****************************************************************************
+* Grava Szd
+*
+***
+cAliaAnte := Alias()
+
+
+dbSelectArea("SZD")
+IF I3TIPOCC == "C"
+	ZZZ := 1
+ELSE
+	ZZZ := 2
+ENDIF
+avalores[1]:=TRBI->ValrRemu
+avalores[2]:=TRBI->ValrAvis
+avalores[3]:=TRBI->ValrFeri
+avalores[4]:=TRBI->ValrDeci
+avalores[5]:=TRBI->ValrFGTS
+avalores[6]:=TRBI->ValrIden
+
+FOR XXX := 1 TO 6          
+ IF avalores[xxx] <> 0 
+	RecLock("SZD",.T.)
+	Replace  ZD_Filial  With  xFilial("SZD")
+	Replace  ZD_DTLAN With  dDataDemP
+	Replace  ZD_COMPETE With  dDataDemP
+	Replace  ZD_DATA With  dDataDemP
+	Replace  ZD_DC With  "D"
+	Replace  ZD_CCD   With cCCusAnte
+	Replace  ZD_CREDITO With ""
+	Replace  ZD_CCC   With ""
+	Replace  ZD_HIST  With SUBSTRING(cHist[xxx] + "-" + TRBI->NomeFunc,1,40)
+	Replace  ZD_SEQC  With ""
+	Replace  ZD_TIPO  With "D"                
+	Replace  ZD_ORIGEM With  "T"
+	Replace  ZD_DEBITO  With  ccontas[ZZZ,xxx]
+	Replace  ZD_VALOR With avalores[xxx]
+	MsUnLock()
+ ENDIF
+next xxx
+
+
+dbSelectArea(cAliaAnte)
+Return
+Static Function GravaSzdCC()
+*****************************************************************************
+* Grava Szd com totais de CC
+*
+***
+cAliaAnte := Alias()
+
+dbSelectArea("SZD")
+
+IF I3TIPOCC == "C"
+	ZZZ := 1
+ELSE
+	ZZZ := 2
+ENDIF
+
+avalores[1]:=nRemuTotC
+avalores[2]:=nAvisTotC  
+avalores[3]:=nFeriTotC  
+avalores[4]:=nDeciTotC  
+avalores[5]:=nFGTSTotC
+avalores[6]:=nIdenTotC  
+m:=month(dDataDemP)
+y:=year(dDataDemP)
+ds:="01"
+m:=m+1
+if m==13
+	m:=1
+	y:=y+1
+endif
+ys:=trim(str(y))
+if len(m)=1 
+	ms:=trim(str(m))
+else
+	ms:="0"+trim(str(m))
+endif
+ds:=ds+"/"+ms+"/"+ys
+daux:=ctod(ds)
+//daux:=dDataDemP+F_UltDia(dDataDemP)
+
+
+
+FOR XXX := 1 TO 6          
+ IF avalores[xxx] <> 0 
+	RecLock("SZD",.T.)
+	Replace  ZD_Filial  With  xFilial("SZD")
+	Replace  ZD_DTLAN With  dDataDemP
+	Replace  ZD_COMPETE With  daux
+	Replace  ZD_DATA With  daux
+	Replace  ZD_DC With  "C"
+	Replace  ZD_CCD   With ""
+	Replace  ZD_DEBITO With ""
+	Replace  ZD_CCC   With cCCusAnte
+	Replace  ZD_HIST  With SUBSTRING(cHist[xxx] + "-VALOR TOTAL",1,40)
+	Replace  ZD_SEQC  With ""
+	Replace  ZD_TIPO  With "D"
+	Replace  ZD_ORIGEM With  "T"
+	Replace  ZD_CREDITO  With  ccontas[ZZZ,xxx]
+	Replace  ZD_VALOR With avalores[xxx]
+	MsUnLock()
+ ENDIF
+next xxx
+
+
+dbSelectArea(cAliaAnte)
+Return
+Static Function ApagaSzd()
+*****************************************************************************
+* Apaga lote em Szd 
+*
+***
+cAliaAnte := Alias()
+
+dbSelectArea("SZD")
+dbSetOrder(4)
+dbSeek(xFilial("SZD")+"T"+DTOS(dDataDemP))
+
+While (! Eof())                           .And. ;
+      (SZD->ZD_Filial  == xFilial("SZD")) .And. ;
+      (SZD->ZD_ORIGEM == "T") .And. ;
+      (SZD->ZD_DTLAN == dDataDemP)
+
+   RecLock("SZD",.F.)
+   Delete
+   MsUnLock()
+   dbSkip()
+End
+
+
+dbSelectArea(cAliaAnte)
+Return
+
+

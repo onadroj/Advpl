@@ -1,0 +1,91 @@
+#include "rwmake.ch"      
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡ao    ³VALID001  ³ Autor ³MAURICIO/GATASSE       ³ Data ³25.02.00  ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡Æo ³GRAVAR NO SZ5, NA TABLEA 97, O SEQUENCIAL DE CADA PRODUTO,  ³±±
+±±³          ³POR GRUPO, QUANDO DA CONFIRMACAO DA ENTRADA DO REGISTRO.    ³±±
+±±³          ³ESTE SEQUNCIAL E GRAVADO NO SZ5 E SX5 TABELA 97             ³±±
+±±³          ³                                                            ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Uso       ³GATILHO DISPARADO POR B1_GRUANAL                            ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Tabelas   ³SZ5                                                         ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Modulo    ³COMPRAS/ESTOQUE E FATURAMENTO - CADASTRO PRODUTOS           ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+
+User Function Valid001()  
+SetPrvt("CALIAS,CGR,CSUBGRUPO,CCLASSE,CCHAV,VL")
+SetPrvt("CCDPROD,")
+
+// Caso o ponto de entrada nÆo venha de uma inclusÆo,
+// retornar sem fazer nada.
+If !INCLUI  // Inclui ‚ uma fun‡Æo l¢gica do SIGA.
+   return
+Endif
+
+// Guardar o alias atual
+cAlias    := Alias()
+cGr       := alltrim(M->B1_GRUANAL)
+//cSubGrupo := alltrim(M->B1_Subgr)
+//cClasse   := alltrim(M->B1_Classe)
+cChav     := cGr
+//+cSubGrupo+cClasse
+// Localizar o registro pela chave correspondente ao grupo
+//                      ÚÄÄÄÄÄ> Nome da Tabela no SX5
+/*
+dbSelectArea("SZ5")
+dbSetOrder(1)
+dbSeek(xFilial("SZ5")+cChav)
+
+
+vl:=AllTrim(Str(val(SZ5->Z5_DESCRI) + 1))
+vl:=subst("0000",1,4-len(vl))+vl
+
+
+cCdProd := cChav+vl
+*/
+
+
+// Substituido pelo assistente de conversao do AP5 IDE em 27/03/00 ==> __Return(cCdProd)
+
+IF INCLUI
+	dbSelectArea("SZ5")
+	dbSetOrder(1)
+	If dbSeek(xFilial("SZ5")+M->B1_GRUANAL)
+		If RecLock("SZ5",Eof())
+			cRet    :=M->B1_GRUANAL
+			cDescri :=SZ5->Z5_DESCRI // Jose Antonio 03/12/2012
+			dbSelectArea("SB1")
+			while dbSeek(xFilial("SB1")+cRet+cDescri)
+				dbSelectArea("SZ5")
+				dbSetOrder(1)
+				If dbSeek(xFilial("SZ5")+cRet+cDescri)
+				   cDescri:=SOMA1(cDescri) // Jose Antonio 03/12/2012
+				Endif   
+				dbSelectArea("SB1")
+			enddo    
+			M->B1_COD:=M->B1_GRUANAL+cDescri
+			cCdProd:=M->B1_GRUANAL+cDescri
+		//	if vAntigo # cRet
+		//		MsgBox("Código do Produto foi alterado para "+cRet+".","INFORMAÇÃO")
+		//	endif    
+		else
+			MsgBox("Grupo em uso por outro usuário. Tente mais tarde!","VALID001")
+			lRet:=.f.
+		endif
+	else
+		MsgBox("Grupo Analítico não encontrado!","VALID001")
+		lRet:=.f.
+	endif
+ENDIF
+
+dbSelectArea(cAlias)
+
+Return(cCdProd)        // incluido pelo assistente de conversao do AP5 IDE em 27/03/00

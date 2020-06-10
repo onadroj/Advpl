@@ -1,0 +1,135 @@
+#include "rwmake.ch"        // incluido pelo assistente de conversao do AP5 IDE em 27/03/00
+
+User Function Fa040grv()        // incluido pelo assistente de conversao do AP5 IDE em 27/03/00
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Declaracao de variaveis utilizadas no programa atraves da funcao    ³
+//³ SetPrvt, que criara somente as variaveis definidas pelo usuario,    ³
+//³ identificando as variaveis publicas do sistema utilizadas no codigo ³
+//³ Incluido pelo assistente de conversao do AP5 IDE                    ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+SetPrvt("CALIAANTE,NAREAANTE,NREGIANTE,WFILIAL,WPREFIXO,WNUM")
+SetPrvt("WPARCELA,WTIPO,CCHAV,SEQ,WFORNECE,WLOJA")
+SetPrvt("SEQSE2,")
+
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡ao    ³FA040GRV  ³ Autor ³MAURICIO/GATASSE       ³ Data ³12.07.99  ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡Æo ³Gravar sequencial e Origem no SE2, quando o titulo gerado   ³±±
+±±³          ³for ISS, e em SE1 IRRF e INSS a Recuperar                   ³±±
+±±³          ³                                                            ³±±
+±±³          ³                                                            ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Uso       ³Apos confirmacao do registro.                               ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Tabelas   ³SE1,SE2,SX5                                                 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Modulo    ³DR                                                          ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+// Caso o ponto de entrada nÆo venha de uma inclusÆo,
+// retornar sem fazer nada.
+
+cAliaAnte := Alias()
+nAreaAnte := IndexOrd()
+nRegiAnte := RecNo()
+
+If !INCLUI // Inclui ‚ uma fun‡Æo l¢gica do SIGA.
+   return
+Endif
+
+wFilial := xFilial("SE1")
+wPrefixo := SE1->E1_PREFIXO
+wNum := SE1->E1_NUM
+aTam:= tamsx3("E1_PARCELA")
+wParcela := SPACE(aTam[1])
+wTipo := "IR-"
+
+// Verifica de  Existe um titulo de IRRF em SE2
+dbSelectArea("SE1")
+dbSetOrder(1)
+IF dbSeek(wFilial+wPrefixo+wNum+wParcela+wTipo)
+// E1_FILIAL+E1_PREFIXO+E1_NUM+E1_PARCELA+E1_TIPO
+                          
+   cChav := "SE1"
+   // Localizar o registro pela chave correspondente ao grupo
+   //                      ÚÄÄÄÄÄ> Nome da Tabela no SX5
+   dbSelectArea("SX5")
+   dbSetOrder(1)
+   dbSeek(xFilial("SX5")+"96"+cChav)
+   Seq :=AllTrim(Str(val(SX5->X5_DESCRI) + 1))
+   Seq :=subst("00000000",1,8-len(Seq))+Seq
+   RecLock("SX5",Eof())
+   replace X5_DESCRI with Seq
+   MSUnlock()
+
+   RecLock("SE1",Eof())
+   replace E1_SEQ with Seq
+   replace E1_ORIG with "R" 
+   MSUnlock()
+ENDIF
+
+// Verifica de  Existe um titulo de INSS  em SE2
+wTipo := "IN-"
+dbSelectArea("SE1")
+dbSetOrder(1)
+IF dbSeek(wFilial+wPrefixo+wNum+wParcela+wTipo)
+
+   cChav := "SE1"
+   // Localizar o registro pela chave correspondente ao grupo
+   //                      ÚÄÄÄÄÄ> Nome da Tabela no SX5
+   dbSelectArea("SX5")
+   dbSetOrder(1)
+   dbSeek(xFilial("SX5")+"96"+cChav)
+   Seq :=AllTrim(Str(val(SX5->X5_DESCRI) + 1))
+   Seq :=subst("00000000",1,8-len(Seq))+Seq
+   RecLock("SX5",Eof())
+   replace X5_DESCRI with Seq
+   MSUnlock()
+
+   RecLock("SE1",Eof())
+   replace E1_SEQ with Seq
+   replace E1_ORIG with "R" 
+   MSUnlock()
+ENDIF
+
+// Verifica de  Existe um titulo de ISS  em SE2
+
+wTipo := "TX "
+wFornece := "MUNIC "
+wLoja := "00"
+
+dbSelectArea("SE2")
+dbSetOrder(1)
+IF dbSeek(wFilial+wPrefixo+wNum+wParcela+wTipo+wFornece+wLoja)
+
+   cChav := "SE2"
+   // Localizar o registro pela chave correspondente ao grupo
+   //                      ÚÄÄÄÄÄ> Nome da Tabela no SX5
+   dbSelectArea("SX5")
+   dbSetOrder(1)
+   dbSeek(xFilial("SX5")+"96"+cChav)
+   SeqSE2:=AllTrim(Str(val(SX5->X5_DESCRI) + 1))
+   SeqSE2:=subst("00000000",1,8-len(SeqSE2))+SeqSE2
+   RecLock("SX5",Eof())
+   replace X5_DESCRI with SeqSE2
+   MSUnlock()
+
+   RecLock("SE2",Eof())
+   replace E2_SEQ with SeqSE2
+   replace E2_ORIG with "P" 
+   MSUnlock()
+ENDIF
+
+dbSelectArea(cAliaAnte)
+dbSetOrder(nAreaAnte)
+dbGoTo(nRegiAnte)
+
+// Substituido pelo assistente de conversao do AP5 IDE em 27/03/00 ==> __Return(.T.)
+Return(.T.)        // incluido pelo assistente de conversao do AP5 IDE em 27/03/00

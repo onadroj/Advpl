@@ -1,0 +1,247 @@
+#include "rwmake.ch"        // incluido pelo assistente de conversao do AP5 IDE em 27/03/00
+
+User Function Sf2460i()        // incluido pelo assistente de conversao do AP5 IDE em 27/03/00
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Declaracao de variaveis utilizadas no programa atraves da funcao    ³
+//³ SetPrvt, que criara somente as variaveis definidas pelo usuario,    ³
+//³ identificando as variaveis publicas do  sistema utilizadas no codigo ³
+//³ Incluido pelo assistente de conversao do AP5 IDE                    ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+LOCAL _BASEISSSF,_BASEISSSD,_VALORISS,AAREA
+
+SetPrvt("CALIAANTE,NAREAANTE,NREGIANTE,CALIAS,CCHAV,X")
+SetPrvt("SEQ,WFILIAL,WPREFIXO,WNUM,WPARCELA,WTIPO")
+SetPrvt("WCLIENTE,WLOJA,Y,ZSEQ,WFORNECE,TipoTES,ACHOU,ACHOULOC,RETISS,TOTRETPISCOF")
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡ao    ³SF2460I   ³ Autor ³MAURICIO/GATASSE       ³ Data ³18.11.99  ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡Æo ³GERA SEQUENCIAL EM SE1 E SE2, APOS GERACAO NA NOTA FISCAL NO³±±
+±±³          ³FATURAMENTO, INCLUSIVE POSSIVEIS IMPOSTOS GERADOS PELO      ³±±
+±±³          ³FATURAMENTO                                                 ³±±
+±±³          ³BUSCA E GRAVA SEQUENCIAL EM SX5                             ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Uso       ³DR - PONTO DE ENTRADA                                       ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Tabelas   ³SX5,SD2,SF2,SE1 E SE2                                       ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Modulo    ³FATURAMENTO                                                 ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±³Ult.Alter.³29/03/01 - incluido o trecho que busca SE1 p/ ver se existe ³±±
+±±³                      titulo para a nota -> p/ Edson                   ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+
+
+AAREA:=GETAREA()
+//BUSCA SEQUENCIAL
+GRAVASX5:=.F.
+dbSelectArea("SX5")
+dbSetOrder(1)
+dbSeek(xFilial("SX5")+"96SE1")
+RecLock("SX5",.f.)
+Seq:=val(SX5->X5_DESCRI) + 1
+Seq:=strzero(Seq,8)
+//VAI GRAVAR SX5 NO FINAL, SOMENTE SE USOU
+
+//TRATAMENTO DE MENSAGENS
+aMsgs:={}
+If (! Empty(SC5->C5_MenPad))
+	//	aadd(aMsgs,FORMULA(xCOD_MENS))
+	aadd(aMsgs,FORMULA(SC5->C5_MenPad))
+Endif
+
+_PCAUCAO:=0
+RETISS:=.F.
+DBSELECTAREA("SZL")
+DBSETORDER(1)
+IF DBSEEK(XFILIAL("SZL")+SC5->C5_CONTRAT)
+	IF SZL->ZL_CAUCAO <> 0
+		_PCAUCAO:=SZL->ZL_CAUCAO
+		_M:="CAUCAO R$ "+ALLTRIM(Transform(SF2->F2_VALBRUT*_PCAUCAO/100,'@E 999,999,999.99'))+" . "
+		aadd(aMsgs,_M)
+	ENDIF
+	IF SZL->ZL_ISSRET <> "N"
+		RETISS:=.T.
+	ENDIF
+	IF ALLTRIM(SZL->ZL_CEI) <> ""
+		_M:="CEI:"+ALLTRIM(SZL->ZL_CEI)+". "
+		aadd(aMsgs,_M)
+	ENDIF
+ENDIF
+IF SF2->F2_VALINSS <> 0
+	_M:="RETENCAO PARA PREVIDENCIA SOCIAL - R$"+AllTrim(Transform(SF2->F2_ValInss,"@E@Z 999,999,999.99"))+" . "
+	aadd(aMsgs,_M)
+ENDIF
+
+TOTRETPISCOF := SF2->F2_VALIMP2 + SF2->F2_VALIMP3 + SF2->F2_VALIMP4  // Valor da retencao de PIS/COFINS/CSLL
+If TOTRETPISCOF > 0
+   _M:="RETENCAO PIS/COFINS/CSLL 4,65% - R$ "+AllTrim(Transform(TOTRETPISCOF,"@E@Z 999,999,999.99"))+" . "
+	aadd(aMsgs,_M)
+Endif
+
+
+//VERIFICAR SE EXISTE TIPO=MO OU LE EM SD2 E TAMBEM ALTERA VALOR DE ISS QUANDO TEM VALOR DE MATERIAL
+ACHOU:=.F.
+ACHOULOC:=.F.
+_BASEISSSF:=SF2->F2_BASEISS-SC5->C5_VLRMAT
+_VALORISS:=0
+dbSelectArea("SD2")
+_aread2:=getarea()
+dbSetOrder(3)// D2_FILIAL+D2_DOC+D2_SERIE+D2_CLIENTE+D2_LOJA+D2_COD+D2_ITEM
+dbSeek(xFilial("SF2")+SF2->F2_DOC+SF2->F2_SERIE+SF2->F2_CLIENTE+SF2->F2_LOJA,.T.)
+While ((! Eof())                         .And.;
+	SD2->D2_Filial   == xFilial("SF2")   .And.;
+	SD2->D2_DOC  	 == SF2->F2_DOC      .And.;
+	SD2->D2_SERIE    == SF2->F2_SERIE    .And.;
+	SD2->D2_LOJA     == SF2->F2_LOJA     .And.;
+	SD2->D2_CLIENTE  == SF2->F2_CLIENTE)
+	IF SD2->D2_TP=="MO"
+		ACHOU:=.T.
+	ENDIF
+	If SD2->D2_TP=="LE"
+		ACHOULOC:=.T.
+	ENDIF
+	IF SC5->C5_TIPO=="N" .AND. SC5->C5_VLRMAT<>0 .AND. SF2->F2_VALISS<>0
+		_BASEISSSD:=SD2->D2_BASEISS*_BASEISSSF/SF2->F2_BASEISS
+		_VALORISS+=_BASEISSSD*SD2->D2_ALIQISS /100
+	ENDIF
+	dbSkip()
+EndDo
+restarea(_aread2)
+IF SC5->C5_TIPO=="N" .AND. SC5->C5_VLRMAT<>0 .AND. SF2->F2_VALISS<>0
+	_M:="MATERIAL APLICADO NA PRESTACAO DE SERVICOS R$ "+ALLTRIM(TRANSFORM(SC5->C5_VLRMAT,"@E 999,999,999.99"))+". "
+	aadd(aMsgs,_M)
+ENDIF
+
+IF !ACHOU .AND. SF2->F2_SERIE=="NFF"
+	_M:="NAO HA FORNECIMENTO DE MAO DE OBRA. "
+	aadd(aMsgs,_M)
+ENDIF
+
+IF ACHOULOC  .AND. !ACHOU
+	_M:="NAO INCIDENCIA DE ISSQN CONFORME LEI COMPLEMENTAR 116 DE 31/07/03. "
+	aadd(aMsgs,_M)
+ELSE
+	IF RETISS
+		_M:="ISS RETIDO NA FONTE PELO CONTRATANTE CONFORME LEI COMPLEMENTAR 116 DE 31/07/03. "
+		aadd(aMsgs,_M)
+	ENDIF
+ENDIF
+//VERIFICAR INSS < 29 LER PARAMETRO
+IF SF2->F2_BASEINS<>0 .AND. SF2->F2_VALINSS==0
+	_M:="O VALOR DA RETENCAO PARA PREVIDENCIA SOCIAL E INFERIOR AO MINIMO DE R$"+ALLTRIM(TRANSFORM(getmv("MV_VLRETIN"),"@E 9,999.99"))+", DISPENSANDO A RETENCAO CONFORME "
+	_M+="INSTRUCAO NORMATIVA No. 71 DO INSS DE 10/05/2002. "
+	aadd(aMsgs,_M)
+ENDIF
+
+IF SF2->F2_SERIE=="NFF"
+	_M:="A DEVOLUCAO DO CANHOTO DATADO E ASSINADO E OBRIGATORIA CONFORME DECRETO LEI 11321 DE 02/05/03. "
+	aadd(aMsgs,_M)
+ENDIF
+
+IF TRIM(SM0->M0_CODIGO) == "04" .AND. SF2->F2_SERIE=="NFF"
+	_M:="DADOS PARA DEPOSITO: BANCO BRADESCO(237) AGENCIA: 3484-3 C/C: 63.325-9. "
+	aadd(aMsgs,_M)
+ENDIF
+
+//VERIFICA TITULOS EM SE1 E GRAVA CAMPOS COMPLEMENTARES E SEQUENCIAL
+dbSelectArea("SE1")
+AAREASE1:=GETAREA()
+dbSetOrder(1)    //E1_FILIAL+E1_PREFIXO+E1_NUM+E1_PARCELA+E1_TIPO
+dbSeek(XFILIAL("SE1")+SF2->F2_SERIE+SF2->F2_DOC,.T.)
+While ((! Eof())                       .AND.;
+	SE1->E1_FILIAL  == SF2->F2_FILIAL  .AND. ;
+	SE1->E1_PREFIXO == SF2->F2_SERIE   .AND. ;
+	SE1->E1_NUM     == SF2->F2_DOC)
+	GRAVASX5:=.T. //SE USOU SX5
+	IF ALLTRIM(SF4->F4_CODIGO) <> "564"
+		RecLock("SE1",.F.)
+		replace E1_SEQ with Seq
+		replace E1_ORIG With "R"
+		replace E1_CCUNID with SC5->C5_CCUNID
+		replace E1_COMPETE with SC5->C5_COMPETE
+		replace E1_HIST with SC5->C5_HIST
+		replace E1_CUSTO with SC5->C5_CUSTO
+		replace SE1->E1_FLUXO with "S"
+		replace SE1->E1_ALUGUEL with "N"
+		replace E1_NATUREZ with SC5->C5_NATUREZ
+		replace E1_DATAMED with SC5->C5_DATAMED
+		IF ((TRIM(SM0->M0_CODIGO) == "05") .AND. (trim(SE1->E1_PREFIXO)=="U"))
+			replace E1_NATUREZ With "1107"
+		ENDIF
+		//		IF SC5->C5_TIPO=="N" .AND. SC5->C5_VLRMAT<>0 .AND. SF2->F2_VALISS<>0
+		//			REPLACE SE1->E1_ISS WITH _VALORISS
+		//		ENDIF
+		MSUnlock()
+	ENDIF
+	dbSkip()
+EndDo
+dbSelectArea("SE2")
+AREASE2:=GETAREA()
+dbSetOrder(1)//E2_FILIAL+E2_PREFIXO+E2_NUM+E2_PARCELA+E2_TIPO+E2_FORNECE+E2_LOJA
+dbSeek(XFILIAL("SE2")+SF2->F2_SERIE+SF2->F2_DOC,.T.)
+While ((! Eof())                       .AND.;
+	SE2->E2_FILIAL  == SF2->F2_FILIAL  .AND. ;
+	SE2->E2_PREFIXO == SF2->F2_SERIE   .AND. ;
+	SE2->E2_NUM     == SF2->F2_DOC)
+	GRAVASX5:=.T.
+	IF SE2->E2_TIPO=="TX " .OR. (SE2->E2_FORNECE==SF2->F2_CLIENTE .AND. SE2->E2_LOJA==SF2->F2_LOJA)
+		RecLock("SE2",.F.)
+		replace E2_SEQ with SEQ
+		replace E2_ORIG with "R"
+		replace E2_CCUNID with SC5->C5_CCUNID
+		replace E2_COMPETE with SC5->C5_COMPETE  
+		replace E2_HIST with SC5->C5_HIST
+		replace E2_CUSTO with SC5->C5_CUSTO
+		replace E2_NATUREZ with SC5->C5_NATUREZ
+		replace E2_CCTBL with SC5->C5_NATUREZ
+		replace E2_FLUXO with "S"
+		//		IF SC5->C5_TIPO=="N" .AND. 	SC5->C5_VLRMAT<>0 .AND. SF2->F2_VALISS<>0 .AND. SE2->E2_TIPO=="TX "
+		//			replace E2_VALOR WITH _VALORISS
+		//			replace E2_SALDO WITH _VALORISS
+		//			replace E2_VLCRUZ WITH _VALORISS
+		//		ENDIF
+		MSUnlock()
+	ENDIF
+	DBSKIP()
+ENDDO
+RESTAREA(AREASE2)
+IF GRAVASX5
+	dbSelectArea("SX5")
+	replace X5_DESCRI with Seq
+ENDIF
+MSUnlock()
+IF SC5->C5_TIPO=="N" .AND. SC5->C5_VLRMAT<>0 .AND. SF2->F2_VALISS<>0
+	DBSELECTAREA("SF3")
+	RecLock("SF3",.F.)
+	replace SF3->F3_BASEICM With _BASEISSSF
+	msUnlock()
+ENDIF
+
+RESTAREA(AAREA)
+//GRAVA SEQUENCIAL E ORIGEM NA NOTA
+RecLock("SF2",.F.)
+IF GRAVASX5
+	_M:=""
+	for x:=1 to len(aMsgs)
+		_M:=_M+aMsgs[x]
+	next
+	replace SF2->F2_SEQ with Seq
+	replace SF2->F2_ORIG With "R"
+	replace SF2->F2_CAUCAO WITH SF2->F2_VALBRUT*_PCAUCAO/100
+	replace SF2->F2_MSGS With _M
+ENDIF
+IF SC5->C5_TIPO=="N" .AND. SC5->C5_VLRMAT<>0 .AND. SF2->F2_VALISS<>0
+	replace SF2->F2_BASEISS With _BASEISSSF
+	//	replace SF2->F2_VALISS With _VALORISS
+ENDIF
+replace SF2->F2_DISCSRV with SC5->C5_DISCSRV   
+replace SF2->F2_DTSAID with IIF(EMPTY(SC5->C5_DTSAID),SF2->F2_EMISSAO,SC5->C5_DTSAID)
+msUnlock()
+Return

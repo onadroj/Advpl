@@ -1,0 +1,254 @@
+#include "rwmake.ch"
+
+
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡ao    ³SF1100I   ³ Autor ³MAURICIO/GATASSE       ³ Data ³18.11.99  ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡Æo ³GERA SEQUENCIAL EM SE2,APOS ENTRADA DA NOTA FISCAL NO ESTO- ³±±
+±±³          ³QUE OU COMPRAS, INCLUSIVE POSSIVEIS IMPOSTOS GERADOS        ³±±
+±±³          ³                                                            ³±±
+±±³          ³BUSCA E GRAVA SEQUENCIAL EM SX5                             ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Tabelas   ³SX5,SD1,SF1 E SE2                                           ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Modulo    ³COMPRAS E ESTOQUE                                           ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+User Function Sf1100i()
+Local aVimp:={}
+SetPrvt("CCHAV,X")
+SetPrvt("SEQ,WFILIAL,WPREFIXO,WNUM,WPARCELA,WTIPO")
+SetPrvt("WFORNECE,WLOJA")
+
+if SF4->F4_DUPLIC <> "S" // se TES NAO gera financeiro
+	return
+endif
+
+//GUARDA DADOS PARA RECUPERAR TITULOS DE IMPOSTOS
+cUniao:=GETMV("MV_UNIAO")
+IF Len(cUniao)>=8
+	cLj:=SUBSTR(cUniao,7,2)
+	cUniao:=SUBSTR(cUniao,1,6)
+ELSEIF Len(cUniao)<7
+	cLj:="00"
+	cUniao:=SUBSTR(cUniao+"        ",1,6)
+ENDIF
+
+cFInss:= GETMV("MV_FORINSS")  
+IF Len(cFInss)>=8
+	cFLj:=SUBSTR(cFInss,7,2)
+	cFInss:=SUBSTR(cFInss,1,6)
+ELSEIF Len(cFInss)<7 
+	cFLj:="00"
+	cFInss:=SUBSTR(cFInss+"        ",1,6)
+ENDIF
+
+cFISS:=GETMV("MV_MUNIC") 
+IF Len(cFISS)>=8
+	cLjI:=SUBSTR(cFISS,7,2)
+	cFISS:=SUBSTR(cFISS,1,6)
+ELSEIF Len(cFISS)<7
+	cLjI:="00"
+	cFISS:=SUBSTR(cFISS+"        ",1,6)
+ENDIF
+
+IF !EMPTY(SE2->E2_FORNISS)
+	cFISS:=SE2->E2_FORNISS
+	cLjI:=SE2->E2_LOJAISS
+ENDIF
+
+aArea:=GetArea()
+
+_ccCol := (AScan(aHeader,{|aItem| AllTrim(aItem[2]) == "D1_CCUNID"}))
+_ccaux:=aCols[1,_ccCol]
+_ccCol1 := (AScan(aHeader,{|aItem| AllTrim(aItem[2]) == "D1_CC"}))
+_ccaux1:=aCols[1,_ccCol1]
+//nPosnat:= (AScan(aHeader,{|aItem| AllTrim(aItem[2])=="D1_NATUREZ"}))
+if !(SF1->F1_TIPO $ "DB")
+	wFilial:=SE2->E2_FILIAL
+	wFornece:=SE2->E2_FORNECE
+	wLoja:=SE2->E2_LOJA
+	wPrefixo:=SE2->E2_PREFIXO
+	wNum:=SE2->E2_NUM
+	
+	dbSelectArea("SE2")
+	dbSetOrder(6)
+	dbSeek(wFilial+wFornece+wLoja+wPrefixo+wNum,.T.)
+	x:=0
+	WHILE ( (! EOF())                 .AND. ;
+		(SE2->E2_FILIAL  == wFilial)  .AND. ;
+		(SE2->E2_FORNECE == wFornece) .AND. ;
+		(SE2->E2_LOJA    == wLoja)    .AND. ;
+		(SE2->E2_PREFIXO == wPrefixo) .AND. ;
+		(SE2->E2_NUM     == wNum))
+		x++
+		dbskip()
+	ENDDO
+	
+	// Localizar o registro pela chave correspondente ao grupo
+	//                      Nome da Tabela no SX5
+	
+	cChav := "SE2"
+	/*
+	dbSelectArea("SX5")
+	dbSetOrder(1)
+	dbSeek(xFilial("SX5")+"96"+cChav)
+	
+	Seq:=AllTrim(Str(val(SX5->X5_DESCRI) + x))
+	Seq:=subst("00000000",1,8-len(Seq))+Seq
+	
+	RecLock("SX5",.f.)
+	replace X5_DESCRI with Seq
+	MSUnlock()
+	*/
+	Seq:=FWGetSX5 ("96",cChav) 
+	Seq:=subst("00000000",1,8-len(Seq))+Seq
+	FwPutSX5(/*cFlavour*/, "96", cChav, Seq, /*cTextoEng*/, /*cTextoEsp*/, /*cTextoAlt*/)
+
+	TipoTES := SF4->F4_TIPOCTA  // se item for ativo fixo
+	if ((TipoTES =="I") )
+		msgstop('ANOTE ESTE SEQUENCIAL NA NOTA FISCAL =====>> '+SEQ)
+	ENDIF
+	
+	dbSelectArea("SE2")
+	dbSetOrder(6)
+	dbSeek(wFilial+wFornece+wLoja+wPrefixo+wNum,.T.)
+	WHILE ( (! EOF())                 .AND. ;
+		(SE2->E2_FILIAL  == wFilial)  .AND. ;
+		(SE2->E2_FORNECE == wFornece) .AND. ;
+		(SE2->E2_LOJA    == wLoja)    .AND. ;
+		(SE2->E2_PREFIXO == wPrefixo) .AND. ;
+		(SE2->E2_NUM     == wNum))
+		RecLock("SE2",.f.)
+		replace E2_SEQ with Seq
+		replace E2_ORIG with "P"
+		replace E2_CCUNID with _ccaux
+		replace E2_CUSTO with _ccaux1
+		replace E2_HIST with cF1_HIST
+		replace E2_COMPETE with SUBSTR(DTOS(SF1->F1_DTDIGIT),5,2)+SUBSTR(DTOS(SF1->F1_DTDIGIT),1,4)
+//		replace E2_NATUREZ with aCols[1,nPosNat]
+		replace E2_HABILIT with "N"
+		MSUnlock()
+		IF SE2->E2_ISS#0
+			aAdd(aVimp,{cFISS+cLjI,SE2->E2_PARCISS,"ISS"})
+		ENDIF
+		IF SE2->E2_IRRF#0
+			aAdd(aVimp,{cUniao+cLj,SE2->E2_PARCIR,"TX "})
+		ENDIF
+		IF SE2->E2_PIS#0
+			aAdd(aVimp,{cUniao+cLj,SE2->E2_PARCPIS,"TX "})
+		ENDIF
+		IF SE2->E2_COFINS#0
+			aAdd(aVimp,{cUniao+cLj,SE2->E2_PARCCOF,"TX "})
+		ENDIF
+		IF SE2->E2_CSLL#0
+			aAdd(aVimp,{cUniao+cLj,SE2->E2_PARCSLL,"TX "})
+		ENDIF
+		IF SE2->E2_INSS#0    
+			aAdd(aVimp,{cFInss+cFLj,SE2->E2_PARCINS,"INS"})
+		ENDIF
+		dbskip()
+	ENDDO
+	DBSELECTAREA("SE2")
+	DBSETORDER(6)
+	FOR X:=1 TO LEN(aVimp)
+		IF dbSeek(xFilial("SE2")+aVimp[X,1]+wPrefixo+SF1->F1_DOC+aVimp[X,2]+aVimp[X,3])
+			RecLock("SE2",.F.)
+			replace E2_SEQ with Seq
+			replace E2_ORIG with "P"
+			replace E2_CCUNID with _ccaux
+			replace E2_CUSTO with _ccaux1
+			replace E2_HIST with cF1_HIST
+			replace E2_COMPETE with SUBSTR(DTOS(SF1->F1_DTDIGIT),5,2)+SUBSTR(DTOS(SF1->F1_DTDIGIT),1,4)
+			//			replace E2_NATUREZ with aCols[1,nPosNat]
+			replace E2_HABILIT with "N"
+			MsUnlock()
+		endif
+	next
+	
+else
+	//SE DEVOLUCAO, VERIFICA TITULO NCC EM SE1 PARA GRAVAR DADOS ADICIONAIS
+	dbSelectArea("SE1")
+	dbOrderNickname("SE14")  //E1_FILIAL+E1_PREFIXO+E1_NUM+E1_TIPO+E1_CLIENTE+E1_LOJA
+	
+	//	dbSetOrder(24) //E1_FILIAL+E1_PREFIXO+E1_NUM+E1_TIPO+E1_CLIENTE+E1_LOJA
+	IF dbSeek(XFILIAL("SE1")+SF1->F1_SERIE+SF1->F1_DOC+"NCC"+SF1->F1_FORNECE+SF1->F1_LOJA)
+		While ((! Eof())                           .And. ;
+			(SE1->E1_Filial             == xFilial("SE1")) .And.;
+			SE1->E1_PREFIXO             == SF1->F1_SERIE   .And.;
+			SE1->E1_NUM                 == SF1->F1_DOC     .And.;
+			SE1->E1_TIPO                == "NCC"           .And.;
+			SE1->E1_CLIENTE             == SF1->F1_FORNECE .And.;
+			SE1->E1_LOJA                == SF1->F1_LOJA)
+			RecLock("SE1",.F.)
+			replace SE1->E1_CUSTO with _ccaux1
+			replace SE1->E1_HIST with cF1_HIST
+			replace SE1->E1_COMPETE with SUBSTR(DTOS(SF1->F1_DTDIGIT),5,2)+SUBSTR(DTOS(SF1->F1_DTDIGIT),1,4)
+			replace SE1->E1_CCUNID with _ccaux
+			replace SE1->E1_ALUGUEL with "N"
+			MSUnlock()
+			dbSkip()
+		EndDo
+	endif
+endif
+restarea(aarea)              
+
+_nUsado := len(aheader)
+aArea:=GetArea()
+//FAZ:=.F.
+
+
+_FRETESIM:=.F.
+//IF FAZ	//TESTA SE NOTA EH DE FRETE
+	_TES:=GetMV("MV_TEFRETE")	//TESTA SE NOTA EH DE FRETE
+	dbSelectArea("SD1")
+	aAreaD1:=GetArea()
+	dbSETOrder(1)//D1_FILIAL+D1_DOC+D1_SERIE+D1_FORNECE+D1_LOJA+D1_COD+D1_ITEM
+	dbSeek(xFilial("SD1")+SF1->F1_DOC+SF1->F1_SERIE+SF1->F1_FORNECE+SF1->F1_LOJA,.T.)
+	While ((! Eof())                           .And. ;
+		(xFilial("SD1"))         == SF1->F1_Filial .And. ;
+		SD1->D1_DOC              == SF1->F1_DOC    .And.;
+		SD1->D1_FORNECE          == SF1->F1_FORNECE .And.;
+		SD1->D1_SERIE            == SF1->F1_SERIE .And.;
+		SD1->D1_LOJA             == SF1->F1_LOJA)
+		IF SD1->D1_TES $ _TES
+			_FRETESIM:=.T.
+		ENDIF
+		dbSkip()
+	EndDo
+	RESTAREA(aAreaD1)
+RestArea(aArea)
+//GRAVA SEQUENCIAL E ORIGEM NA NOTA
+RecLock("SF1",.F.)
+SF1->F1_SEQ    := Seq
+SF1->F1_ORIG   := "P"
+SF1->F1_HIST   := cF1_HIST
+SF1->F1_DTREAL := MSDATE()
+//IF _FRETESIM
+//	SF1->F1_ESPECIE := "CTR"
+//ENDIF
+IF SF1->F1_TIPO=="N" .AND. ALLTRIM(SF1->F1_ESPECIE)$"NFPS/NFSE/NFF"
+	IF !(SA2->A2_COD_MUN=="06200") //BELO HORIZONTE
+		SF1->F1_MODNF := " "
+		SF1->F1_SERIEDS := "OM"                                      
+	ELSE
+		SF1->F1_MODNF := "U"
+		IF	ALLTRIM(SF1->F1_ESPECIE)$"NFF"
+			SF1->F1_SERIEDS := "SF"
+		ELSEIF	ALLTRIM(SF1->F1_ESPECIE)$"NFSE"
+			SF1->F1_SERIEDS := "SE"
+		ELSEIF	ALLTRIM(SF1->F1_ESPECIE)$"NFPS"
+			SF1->F1_SERIEDS := "S"
+		ENDIF			
+	ENDIF
+ENDIF
+mSUnlock()
+cF1_HIST:=NIL
+
+Return

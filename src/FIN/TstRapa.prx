@@ -1,0 +1,98 @@
+#include "rwmake.ch"        // incluido pelo assistente de conversao do AP5 IDE em 27/03/00
+
+User Function TstRaPa()        // incluido pelo assistente de conversao do AP5 IDE em 27/03/00
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Declaracao de variaveis utilizadas no programa atraves da funcao    ³
+//³ SetPrvt, que criara somente as variaveis definidas pelo usuario,    ³
+//³ identificando as variaveis publicas do sistema utilizadas no codigo ³
+//³ Incluido pelo assistente de conversao do AP5 IDE                    ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+SetPrvt("CALIAANTE,NAREAANTE,NREGIANTE,WFILIAL,WPREFIXO,WNUM")
+SetPrvt("WPARCELA,WTIPO,CCHAV,SEQ,WFORNECE,WLOJA")
+SetPrvt("SEQSE2,")
+
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡ao    ³TstRaPa  ³ Autor ³MAURICIO/GATASSE       ³ Data ³12.07.99  ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡Æo ³Testa se já existe um tipo em E1 = RA e informa a existencia³±±
+±±³          ³de um recebimento ou pagamento antecipado.                  ³±±
+±±³          ³                                                            ³±±
+±±³          ³                                                            ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Uso       ³Apos escolha do cliente-gatilho                             ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Tabelas   ³SE1,SE2                                                     ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Modulo    ³modulo                                                      ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+// Caso o ponto de entrada nÆo venha de uma inclusÆo,
+// retornar sem fazer nada.
+
+
+cAliaAnte := Alias()
+nAreaAnte := IndexOrd()
+nRegiAnte := RecNo()      
+cparam:=paramIXB
+tem:=.F.
+
+IF cparam == "RA" 
+// Verifica de  Existe um titulo do tipo RA em SE1
+	dbSelectArea("SE1")
+//	dbSetOrder(16)   
+	dbOrderNickName("SE12")    
+	dbSeek(xFilial("SE1")+M->E1_CLIENTE+"RA ")
+	While ((! Eof())                         .And. ;
+      (SE1->E1_Filial  == xFilial("SE1")) .And. ;
+      (SE1->E1_CLIENTE  == M->E1_CLIENTE) .And. ;
+      (SE1->E1_TIPO == "RA ") )
+
+	   IF (SE1->E1_SALDO  > 0)  
+			Tem:=.T.
+	   ENDIF                                             
+	   dbSkip()
+	EndDo
+
+	IF Tem
+		Msgstop("Cliente possui um recebimento antecipado (RA).")
+	ENDIF           
+	RETORNO:=M->E1_CLIENTE
+ENDIF
+
+IF cparam == "PA" 
+// Verifica de  Existe um titulo do tipo RA em SE1
+	dbSelectArea("SE2")
+//	dbSetOrder(12)       
+	dbOrderNickName("SE21")
+	dbSeek(xFilial("SE2")+M->E2_FORNECE+"PA ")
+	While ((! Eof())                         .And. ;
+      (SE2->E2_Filial  == xFilial("SE2")) .And. ;
+      (SE2->E2_FORNECE  == M->E2_FORNECE) .And. ;
+      (SE2->E2_TIPO == "PA ") )
+
+	   IF (SE2->E2_SALDO  > 0)  
+			Tem:=.T.
+	   ENDIF                                             
+	   dbSkip()
+	EndDo
+
+	IF Tem
+		Msgstop("Fornecedor possui um pagamento antecipado (PA).")
+	ENDIF           
+	RETORNO:=M->E2_FORNECE
+ENDIF
+
+dbSelectArea(cAliaAnte)
+dbSetOrder(nAreaAnte)
+dbGoTo(nRegiAnte)
+
+
+
+Return(RETORNO)        // incluido pelo assistente de conversao do AP5 IDE em 27/03/00

@@ -1,0 +1,106 @@
+#include "rwmake.ch"
+
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡ao    ³VALCUSTO  ³ Autor ³MAURICIO/GATASSE       ³ Data ³25.02.00  ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡Æo ³VALIDA SE O CENTRO DE CUSTO ESTA HABILITADO E ANALITICO.    ³±±
+±±³          ³VERIFICA SE O CC E VALIDO NA CONTA CONTABIL ASSOCIADA A ELE ³±±
+±±³          ³QUANDO E LANCADO NA TELA DE CONTABILIZACAO                  ³±±
+±±³          ³                                                            ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Uso       ³VALIDACAO DO USUARIO NOS CAMPOS QUE SOLICITA O CC           ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Tabelas   ³SI3,SI1                                                     ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Modulo    ³TODOS                                                       ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+User Function Valcusto()
+LOCAL aarea:=getarea()
+Local XVALRMACR,ACHOU,NPOS,MCONTAB
+Local lRet  := .t.    
+Local aAreaCTT
+Local aAreaCT1
+
+//Alert(__READVAR)        
+return(.T.)
+IF FUNNAME()=="GPEA180" //Não validar CC na transferência de funcionários
+	return(.T.)
+ENDIF
+xValrMacr := ALLTRIM(&__READVAR)
+dbSelectArea("CTT")
+aAreaCTT:=GETAREA()
+dbSetOrder(1)
+if !empty(xValrMacr)
+	lRet  := .f.
+	Achou:=.F.
+	if dbSeek(xFilial("CTT")+xValrMacr)
+		Achou:=.T.
+	endif
+	If ALLTRIM(CTT->CTT_Classe) == "2" .and. ALLTRIM(CTT->CTT_BLOQ) == "2" .and. Achou
+		lRet := .T.
+	Else
+		MsgBox("Centro de Custo Invalido!. Precisa existir, estar habilitado e ser Analitico.","Valcusto")
+		lRet := .F.
+	Endif
+	If cModulo=="GPE" .and. Achou
+		IF CTT->CTT_USOGPE == "S"
+			lRet := .T.
+		Else
+			MsgBox("Centro de Custo Inválido!. Não habilitado para o módulo GPE.","Valcusto")
+			lRet := .F.
+		ENDIF
+	Endif
+	
+	If cModulo<>"GPE" .and. Achou
+		IF CTT->CTT_USOGPE <> "S"
+			lRet := .T.
+		Else
+			MsgBox("Centro de Custo Inválido!. Habilitado somente para modulo GPE.","VALCUSTO","INFO")
+			lRet := .F.
+		ENDIF
+	Endif
+	if lRet == .T.
+		if __READVAR == "CT2_CCD"
+			//Pega o Valor da Conta de Debito posicionado na Grade
+			nPos:= (AScan(aHeader,{|aItem| AllTrim(aItem[2])=="CT2_DEBITO"}))
+			dbSelectArea("CT1")
+			aAreaCT1:=GETAREA()
+			dbSetOrder(1)
+			dbseek(xFilial("CT1")+aCols[n,nPos])
+			IF (EMPTY(aCols[n,nPos]) .or. CT1->CT1_CCOBRG=="2")
+				MSGBOX("Centro de Custo Debito nao Necessario ou Invalido!","VALCUSTO")
+				lRet:= .F.
+			ELSE
+				lRet:= .T.
+			ENDIF   
+			restarea(aAreaCT1)
+		ENDIF
+		IF __READVAR == "CT2_CCC"
+			//Pega o Valor da Conta de Debito posicionado na Grade
+			nPos:= (AScan(aHeader,{|aItem| AllTrim(aItem[2])=="CT2_CREDITO"}))
+			dbSelectArea("CT1")
+			aAreaCT1:=GETAREA()
+			dbSetOrder(1)
+			dbseek(xFILIAL("CT1")+aCols[n,nPos])
+			
+			IF (EMPTY(aCols[n,nPos]) .or. CT1->CT1_CCOBRG=="2")
+				MSGBOX("Centro de Custo Credito nao Necessario ou Invalido !","VALCUSTO")
+				lRet:= .F.
+			ELSE
+				lRet:= .T.
+			ENDIF
+			restarea(aAreaCT1)
+		ENDIF
+	endif
+endif
+restarea(aAreaCTT)
+restarea(aarea)
+Return( lRet )
+
+//CTT->CTT_BLOQ#"1" .AND. ((cModulo=="GPE" .and. CTT->CTT_USOGPE == "S" ) .or. ( cModulo#"GPE" .AND. CTT->CTT_USOGPE # "S" ))
